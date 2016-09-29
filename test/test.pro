@@ -8,10 +8,11 @@ TARGET = test
 INCLUDEPATH += .
 CONFIG += testcase
 
-HEADERS +=	TestMidiParser.h \
+HEADERS +=	TestMain.h \
 			../src/MidiParser.h
 
-SOURCES +=	TestMidiParser.cpp
+SOURCES +=	TestMain.cpp \
+			TestMidiParser.cpp
 
 OBJECTS +=	../src/obj/MidiParser.o
 
