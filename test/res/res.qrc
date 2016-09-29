@@ -1,0 +1,6 @@
+<!DOCTYPE RCC><RCC version="1.0">
+ <qresource>
+  <file>MidiParserSetInstrument1.midi</file>
+  <file>MidiParserSetInstrument2.midi</file>
+ </qresource>
+</RCC>
