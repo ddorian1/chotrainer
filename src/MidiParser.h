@@ -1,6 +1,7 @@
 #ifndef MIDI_PARSER_H
 #define MIDI_PARSER_H
 
+#include <fstream>
 #include <string>
 #include <vector>
 //#include <QtTempFile>
@@ -22,13 +23,13 @@ class MidiParser {
 		 * Get start of track, counting from 0.
 		 * Returns nullptr if track can't be found.
 		 */
-		char* getTrackStart(size_t track) const;
+		char* getTrackPos(size_t track);
 
 		/**
 		 * Get pos of instrument meta event in track, counting tracks from 0.
 		 * Returns nullptr if not found.
 		 */
-		char* getInstrumentPos(size_t track) const;
+		char* getInstrumentPos(size_t track);
 
 		/**
 		 * Interpret v_length value pointed to by p.
@@ -44,6 +45,12 @@ class MidiParser {
 		 * number of bytes used by v_length as second value of pair.
 		 */
 		static std::vector<unsigned char> sizeTToVLength(size_t length);
+
+		/**
+		 * Get bytes till end of data, including byte pointed to.
+		 * Throws if pointer doesn't point into data.
+		 */
+		size_t getBytesTillEnd(const char *p) const;
 
 	public:
 		/**
