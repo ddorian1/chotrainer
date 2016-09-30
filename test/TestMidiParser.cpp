@@ -1,5 +1,6 @@
 #include "TestMain.h"
-#include "../src/MidiParser.h"
+
+#include <MidiParser.h>
 
 #include <cstring>
 

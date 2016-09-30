@@ -5,21 +5,15 @@
 QT += testlib
 TEMPLATE = app
 TARGET = test
-INCLUDEPATH += .
-CONFIG += testcase debug
+INCLUDEPATH += ../core
+LIBS += ../core/libcore.a
+CONFIG += testcase
 
-HEADERS +=	TestMain.h \
-			../src/Exception.h \
-			../src/MidiParser.h
+include(../common.pri)
+
+HEADERS +=	TestMain.h
 
 SOURCES +=	TestMain.cpp \
 			TestMidiParser.cpp
 
-OBJECTS +=	../src/obj/Exception.o \
-			../src/obj/MidiParser.o
-
 RESOURCES += res/res.qrc
-
-QMAKE_CXXFLAGS += -g -Wall -Wextra -Werror
-MOC_DIR = moc
-OBJECTS_DIR = obj

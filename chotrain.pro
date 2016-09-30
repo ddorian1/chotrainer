@@ -5,6 +5,7 @@
 TEMPLATE = subdirs
 CONFIG += c++11 ordered
 
-SUBDIRS =	src \
+SUBDIRS =	core \
 			test
 
+test.depends = core
