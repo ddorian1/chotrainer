@@ -20,6 +20,8 @@ MidiParser::MidiParser(const std::string &filePath)
 	file.read(data.data(), fileSize);
 	if (!file) throw(Exception("Can't read file"));
 
+	//TODO test for file type 1
+
 	size_t trackCount = 0;
 	while (getTrackPos(trackCount) != nullptr) ++trackCount;
 	voiceMuted = std::vector<bool>(trackCount, false);
@@ -207,8 +209,8 @@ void MidiParser::setForegroundVoice(size_t track) {
 	}
 }
 
-std::string MidiParser::getTmpFilePath() {
-	tmpFile.reset(new QTemporaryFile(QDir::cleanPath(QString("%1/%2-XXXXXX.midi").arg(QDir::tempPath(), QCoreApplication::applicationName()))));
+std::shared_ptr<QTemporaryFile> MidiParser::getTmpFile() const {
+	std::shared_ptr<QTemporaryFile> tmpFile(new QTemporaryFile(QDir::cleanPath(QString("%1/%2-XXXXXX.midi").arg(QDir::tempPath(), QCoreApplication::applicationName()))));
 	tmpFile->open();
 
 	const std::string path = tmpFile->fileName().toStdString();
@@ -218,5 +220,5 @@ std::string MidiParser::getTmpFilePath() {
 	f.write(data.data(), data.size());
 	if (!f) throw(Exception("Can't write to file"));
 	
-	return path;
+	return tmpFile;
 }

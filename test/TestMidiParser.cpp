@@ -35,9 +35,9 @@ void TestMain::midiParser() {
 
 	MidiParser mp(tmpF1->fileName().toStdString());
 	mp.setForegroundVoice(2);
-	std::string path = mp.getTmpFilePath();
+	std::shared_ptr<QTemporaryFile> tmpFile = mp.getTmpFile();
 
-	QVERIFY(compareFiles(path, tmpF2->fileName().toStdString()));
+	QVERIFY(compareFiles(tmpFile->fileName().toStdString(), tmpF2->fileName().toStdString()));
 
 	delete tmpF1;
 	delete tmpF2;

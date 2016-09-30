@@ -12,7 +12,6 @@ class MidiParser {
 		std::ifstream file;
 		std::vector<char> data;
 		std::vector<bool> voiceMuted;
-		std::unique_ptr<QTemporaryFile> tmpFile;
 
 		/**
 		 * Set Instrument of track, counting tracks from 0.
@@ -68,7 +67,7 @@ class MidiParser {
 		void muteVoice(size_t track);
 		void unmuteAll();
 
-		std::string getTmpFilePath();
+		std::shared_ptr<QTemporaryFile> getTmpFile() const;
 };
 
 #endif //MIDI_PARSER_H
