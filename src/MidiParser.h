@@ -2,16 +2,17 @@
 #define MIDI_PARSER_H
 
 #include <fstream>
+#include <memory>
 #include <string>
 #include <vector>
-//#include <QtTempFile>
+#include <QTemporaryFile>
 
 class MidiParser {
 	private:
 		std::ifstream file;
 		std::vector<char> data;
 		std::vector<bool> voiceMuted;
-		//QTempfile tmpFile;
+		std::unique_ptr<QTemporaryFile> tmpFile;
 
 		/**
 		 * Set Instrument of track, counting tracks from 0.
@@ -60,6 +61,8 @@ class MidiParser {
 		void setForegroundVoice(size_t track);
 		void muteVoice(size_t track);
 		void unmuteAll();
+
+		std::string getTmpFilePath();
 };
 
 #endif //MIDI_PARSER_H

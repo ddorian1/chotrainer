@@ -9,12 +9,14 @@ INCLUDEPATH += .
 CONFIG += testcase
 
 HEADERS +=	TestMain.h \
+			../src/Exception.h \
 			../src/MidiParser.h
 
 SOURCES +=	TestMain.cpp \
 			TestMidiParser.cpp
 
-OBJECTS +=	../src/obj/MidiParser.o
+OBJECTS +=	../src/obj/Exception.o \
+			../src/obj/MidiParser.o
 
 RESOURCES += res/res.qrc
 
