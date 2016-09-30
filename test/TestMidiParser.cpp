@@ -37,16 +37,6 @@ void TestMain::midiParser() {
 	mp.setForegroundVoice(2);
 	std::string path = mp.getTmpFilePath();
 
-	std::ifstream i(path, std::ifstream::binary);
-	std::ofstream o("test.midi", std::ofstream::binary);
-	i.seekg(0, i.end);
-	size_t s = i.tellg();
-	i.seekg(0, i.beg);
-	char *p = new char[s];
-	i.read(p, s);
-	o.write(p, s);
-	delete[] p;
-
 	QVERIFY(compareFiles(path, tmpF2->fileName().toStdString()));
 
 	delete tmpF1;
