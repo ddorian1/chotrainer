@@ -29,7 +29,7 @@ static bool compareFiles(const std::string &path1, const std::string &path2) {
 void TestMain::midiParser() {
 	QFile f1(":/MidiParserSetInstrument1.midi");
 	QTemporaryFile *tmpF1 = QTemporaryFile::createNativeFile(f1);
-	QFile f2(":/MidiParserSetInstrument1.midi");
+	QFile f2(":/MidiParserSetInstrument2.midi");
 	QTemporaryFile *tmpF2 = QTemporaryFile::createNativeFile(f2);
 
 	MidiParser mp(tmpF1->fileName().toStdString());

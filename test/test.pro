@@ -6,7 +6,7 @@ QT += testlib
 TEMPLATE = app
 TARGET = test
 INCLUDEPATH += .
-CONFIG += testcase
+CONFIG += testcase debug
 
 HEADERS +=	TestMain.h \
 			../src/Exception.h \

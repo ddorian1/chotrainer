@@ -1,6 +1,9 @@
 #include "MidiParser.h"
 #include "Exception.h"
 
+#include <QDir>
+#include <QCoreApplication>
+
 #include <cstring>
 #include <list>
 #include <tuple>
@@ -35,46 +38,116 @@ char* MidiParser::getTrackPos(size_t track) {
 	return nullptr;
 }
 
-char* MidiParser::getInstrumentPos(size_t track) {
-	constexpr unsigned char instMark[2] = {0xFF, 0x04}; //??
-	char *trackEnd = getTrackPos(track + 1);
-	if (!trackEnd) trackEnd = data.data() + data.size();
+std::list<char*> MidiParser::getPosOfEvents(size_t track, unsigned char event, unsigned char mask) {
+	std::list<char*> events;
 
-	for (char *p = getTrackPos(track); p != trackEnd - 1; ++p)
-		if (!std::memcmp(instMark, p, 2)) return p;
+	char *p = getTrackPos(track);
+	const char *nextTrack = getTrackPos(track + 1);
+	if (!nextTrack) nextTrack = data.data() + data.size();
+
+	p += 8; //Skip "MTrk" and length
+	while (nextTrack - p > 0) {
+		/* Skip delta_time */
+		size_t vLengthBytes;
+		std::tie(std::ignore, vLengthBytes) = sizeTFromVLength(p);
+		p += vLengthBytes;
+		if (nextTrack - p <= 0) throw(Exception("Invalid file"));
+
+		/* Check if event matches search */
+		if (event == (*reinterpret_cast<unsigned char*>(p) & mask)) events.push_back(p);
+
+		/* Skip event */
+		switch (*reinterpret_cast<unsigned char*>(p) & 0xF0u) {
+			case 0xF0u:
+				switch (*reinterpret_cast<unsigned char*>(p)) {
+					case 0xFFu:
+						/* Meta event */
+						p += 2;
+						break;
+					case 0xF0u:
+					case 0xF7u:
+						/* Sysex event */
+						++p;
+						break;
+					default:
+						throw(Exception("Unknown event"));
+				}
+				if (nextTrack - p <= 0) throw(Exception("Invalid file"));
+				size_t length;
+				std::tie(length, vLengthBytes) = sizeTFromVLength(p);
+				p += vLengthBytes + length;
+				break;
+			case 0xC0u:
+			case 0xD0u:
+				/* One Byte of data */
+				p += 2;
+				break;
+			case 0x80u:
+			case 0x90u:
+			case 0xA0u:
+			case 0xB0u:
+			case 0xE0u:
+				/* Two Bytes of data */
+				p += 3;
+				break;
+			default:
+				throw(Exception("Unknown event"));
+		}
+	}
+
+	return events;
+}
+
+char* MidiParser::getInstrumentPos(size_t track) {
+	std::list<char*> metaEvents = getPosOfEvents(track, 0xFFu);
+	for (const auto &event : metaEvents) {
+		if (*reinterpret_cast<unsigned char*>(event + 1) == 0x04u)
+			return event;
+	}
 	return nullptr;
 }
 
-void MidiParser::setInstrument(size_t track, const std::string &instrument) {
+void MidiParser::setInstrument(size_t track, unsigned char instrumentId, const std::string &instrumentName) {
+	setInstrumentName(track, instrumentName);
+	setInstrumentId(track, instrumentId);
+}
+
+void MidiParser::setInstrumentId(size_t track, unsigned char instrumentId) {
+	std::list<char*> programChangeEvents = getPosOfEvents(track, 0xC0u, 0xF0u);
+	for (const auto &event : programChangeEvents)
+		*reinterpret_cast<unsigned char*>(event + 1) = instrumentId;
+}
+
+void MidiParser::setInstrumentName(size_t track, const std::string &instrumentName) {
 	char *instPos = getInstrumentPos(track);
 	if (!instPos) throw(Exception("No such track"));
 
 	size_t oldInstNameSize, oldVLengthBytes;
 	std::tie(oldInstNameSize, oldVLengthBytes) = sizeTFromVLength(instPos + 2);
 
-	const std::vector<unsigned char> newVLength = sizeTToVLength(instrument.size());
+	const std::vector<unsigned char> newVLength = sizeTToVLength(instrumentName.size());
 
-	if (oldInstNameSize + oldVLengthBytes < instrument.size() + newVLength.size()) {
+	if (oldInstNameSize + oldVLengthBytes < instrumentName.size() + newVLength.size()) {
 		data.resize(data.size()
 				- oldInstNameSize - oldVLengthBytes
-				+ instrument.size() + newVLength.size());
+				+ instrumentName.size() + newVLength.size());
 		instPos = getInstrumentPos(track);
 	}
 
-	char *copyTo = instPos + 2 + newVLength.size() + instrument.size();
+	char *copyTo = instPos + 2 + newVLength.size() + instrumentName.size();
 	char *copyFrom = instPos + 2 + oldVLengthBytes + oldInstNameSize;
 	const size_t bytesToCopy = std::min(getBytesTillEnd(copyFrom), getBytesTillEnd(copyTo));
 	std::memmove(copyTo, copyFrom, bytesToCopy);
 
-	if (oldInstNameSize + oldVLengthBytes > instrument.size() + newVLength.size()) {
+	if (oldInstNameSize + oldVLengthBytes > instrumentName.size() + newVLength.size()) {
 		data.resize(data.size()
 				- oldInstNameSize - oldVLengthBytes
-				+ instrument.size() + newVLength.size());
+				+ instrumentName.size() + newVLength.size());
 		instPos = getInstrumentPos(track);
 	}
 
 	std::memcpy(instPos + 2, newVLength.data(), newVLength.size());
-	std::memcpy(instPos + 2 + newVLength.size(), instrument.data(), instrument.size());
+	std::memcpy(instPos + 2 + newVLength.size(), instrumentName.data(), instrumentName.size());
 			
 	char *trackPos = getTrackPos(track);
 	char *nextTrackPos = getTrackPos(track + 1);
@@ -124,19 +197,18 @@ size_t MidiParser::getBytesTillEnd(const char *p) const {
 }
 
 void MidiParser::setForegroundVoice(size_t track) {
-	setInstrument(track, "voice oohs");
-	setInstrument(1, "acoustic grand");
+	setInstrument(track, 0x35u, "voice oohs");
 	for (size_t i = 0; getTrackPos(i) != nullptr; ++i) {
 		if (i != track) {
 			try {
-				setInstrument(i, "acoustic grand");
+				setInstrument(i, 0x00u, "acoustic grand");
 			} catch (Exception &e) {}
 		}
 	}
 }
 
 std::string MidiParser::getTmpFilePath() {
-	tmpFile.reset(new QTemporaryFile("XXXXXX.midi"));
+	tmpFile.reset(new QTemporaryFile(QDir::cleanPath(QString("%1/%2-XXXXXX.midi").arg(QDir::tempPath(), QCoreApplication::applicationName()))));
 	tmpFile->open();
 
 	const std::string path = tmpFile->fileName().toStdString();

@@ -18,7 +18,11 @@ class MidiParser {
 		 * Set Instrument of track, counting tracks from 0.
 		 * Throws in case of error.
 		 */
-		void setInstrument(size_t track, const std::string &instrument);
+		void setInstrument(size_t track, unsigned char instrumentId, const std::string &instrument);
+
+		void setInstrumentId(size_t track, unsigned char instrumentId);
+
+		void setInstrumentName(size_t track, const std::string &instrumentName);
 
 		/**
 		 * Get start of track, counting from 0.
@@ -31,6 +35,8 @@ class MidiParser {
 		 * Returns nullptr if not found.
 		 */
 		char* getInstrumentPos(size_t track);
+
+		std::list<char*> getPosOfEvents(size_t track, unsigned char event, unsigned char mask = 0xFFu);
 
 		/**
 		 * Interpret v_length value pointed to by p.
