@@ -20,20 +20,21 @@ Fluidsynth::Fluidsynth()
 }
 
 Fluidsynth::~Fluidsynth() {
-	delete_fluid_audio_driver(adriver);
 	delete_fluid_player(player);
+	delete_fluid_audio_driver(adriver);
 	delete_fluid_synth(synth);
 	delete_fluid_settings(settings);
 }
 
 void Fluidsynth::play(const std::string &filePath) {
-	stop();
+	if (fluid_player_get_status(player) == FLUID_PLAYER_PLAYING) stop();
+
 	if (!fluid_is_midifile(filePath.c_str())) throw(Exception("File is no midi file"));
 	fluid_player_add(player, filePath.c_str());
 	fluid_player_play(player);
 }
 
 void Fluidsynth::stop() {
-	fluid_player_stop(player);
-	fluid_player_join(player);
+	delete_fluid_player(player);
+	player = new_fluid_player(synth);
 }

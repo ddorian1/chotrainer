@@ -1,3 +1,4 @@
+QT += core
 CONFIG += debug
 QMAKE_CXXFLAGS += -g -Wall -Wextra -Werror
 LIBS += -lfluidsynth

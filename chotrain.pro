@@ -6,6 +6,8 @@ TEMPLATE = subdirs
 CONFIG += c++11 ordered
 
 SUBDIRS =	core \
+			chotrain \
 			test
 
+chotrain.depends = core
 test.depends = core
