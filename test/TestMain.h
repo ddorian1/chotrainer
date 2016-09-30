@@ -8,9 +8,8 @@ class TestMain : public QObject {
 	Q_OBJECT
 
 	private slots:
+		void fluidsynth();
 		void midiParser();
-		//void setForegroundVoice();
-		//void muteVoice(size_t voice);
 };
 
 #endif //TEST_MAIN_H

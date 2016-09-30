@@ -11,3 +11,5 @@ HEADERS +=	Exception.h \
 SOURCES +=	Exception.cpp \
 			Fluidsynth.cpp \
 			MidiParser.cpp
+
+RESOURCES += res/core.qrc
