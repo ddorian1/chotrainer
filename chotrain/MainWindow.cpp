@@ -3,10 +3,12 @@
 #include <QVBoxLayout>
 #include <QFrame>
 
-MainWindow::MainWindow(size_t ownTrack)
+MainWindow::MainWindow(const std::string &midiFile, size_t ownTrack)
 :
 	ownTrack(ownTrack),
+	midiParser(midiFile),
 	playing(false),
+	bOwnVoiceOnly(new QToolButton(this)),
 	bOwnVoiceForeground(new QToolButton(this)),
 	bNoForeground(new QToolButton(this)),
 	bOwnVoiceMute(new QToolButton(this)),
@@ -18,6 +20,7 @@ MainWindow::MainWindow(size_t ownTrack)
 	QFrame *sep = new QFrame(this);
 	sep->setFrameShape(QFrame::HLine);
 
+	layout->addWidget(bOwnVoiceOnly);
 	layout->addWidget(bOwnVoiceForeground);
 	layout->addWidget(bNoForeground);
 	layout->addWidget(bOwnVoiceMute);
@@ -28,35 +31,68 @@ MainWindow::MainWindow(size_t ownTrack)
 	centralWidget->setLayout(layout);
 	setCentralWidget(centralWidget);
 
+	bOwnVoiceOnly->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	bOwnVoiceForeground->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	bNoForeground->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	bOwnVoiceMute->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 
+	bOwnVoiceOnly->setText(tr("Only my voice"));
 	bOwnVoiceForeground->setText(tr("Emphatize my voice"));
 	bNoForeground->setText(tr("Don't emphatize my voice"));
 	bOwnVoiceMute->setText(tr("Mute my voice"));
 	bPlayStop->setText(tr("Play"));
 	bPlayStop->setIcon(QIcon::fromTheme("media-playback-start"));
 
-	QObject::connect(bOwnVoiceForeground, SIGNAL(clicked()), this, SLOT(onOwnVoiceForeground));
-	QObject::connect(bNoForeground, SIGNAL(clicked()), this, SLOT(onNoForeground));
-	QObject::connect(bOwnVoiceMute, SIGNAL(clicked()), this, SLOT(onOwnVoiceMute));
-	QObject::connect(bPlayStop, SIGNAL(clicked()), this, SLOT(onPlayStop));
+	QObject::connect(bOwnVoiceOnly, &QToolButton::clicked, this, &MainWindow::onOwnVoiceOnly);
+	QObject::connect(bOwnVoiceForeground, &QToolButton::clicked, this, &MainWindow::onOwnVoiceForeground);
+	QObject::connect(bNoForeground, &QToolButton::clicked, this, &MainWindow::onNoForeground);
+	QObject::connect(bOwnVoiceMute, &QToolButton::clicked, this, &MainWindow::onOwnVoiceMute);
+	QObject::connect(bPlayStop, &QPushButton::clicked, this, &MainWindow::onPlayStop);
 
+	bOwnVoiceOnly->setCheckable(true);
 	bOwnVoiceForeground->setCheckable(true);
 	bNoForeground->setCheckable(true);
 	bOwnVoiceMute->setCheckable(true);
-	bOwnVoiceForeground->setChecked(true);
+
+	onOwnVoiceForeground();
+	//bOwnVoiceForeground->setChecked(true);
+}
+
+void MainWindow::setChecked(const QToolButton *button) {
+	bOwnVoiceOnly->setChecked(button == bOwnVoiceOnly);
+	bOwnVoiceForeground->setChecked(button == bOwnVoiceForeground);
+	bNoForeground->setChecked(button == bNoForeground);
+	bOwnVoiceMute->setChecked(button == bOwnVoiceMute);
 }
 
 void MainWindow::onPlayStop() {
+	if (playing) {
+		fluidsynth.stop();
+		bPlayStop->setText(tr("Play"));
+		bPlayStop->setIcon(QIcon::fromTheme("media-playback-start"));
+	} else {
+		fluidsynth.play(midiFile->fileName().toStdString());
+		bPlayStop->setText(tr("Stop"));
+		bPlayStop->setIcon(QIcon::fromTheme("media-playback-stop"));
+	}
+
+	playing = !playing;
+}
+
+void MainWindow::onOwnVoiceOnly() {
+	setChecked(bOwnVoiceOnly);
 }
 
 void MainWindow::onOwnVoiceForeground() {
+	setChecked(bOwnVoiceForeground);
+	midiParser.setForegroundVoice(ownTrack);
+	midiFile = midiParser.getTmpFile();
 }
 
 void MainWindow::onNoForeground() {
+	setChecked(bNoForeground);
 }
 
 void MainWindow::onOwnVoiceMute() {
+	setChecked(bOwnVoiceMute);
 }
