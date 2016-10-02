@@ -45,10 +45,10 @@ std::list<char*> MidiParser::getPosOfEvents(size_t track, unsigned char event, u
 
 	char *p = getTrackPos(track);
 	size_t trackLen = 0;
-	trackLen |= *(p + 4) << 24;
-	trackLen |= *(p + 5) << 16;
-	trackLen |= *(p + 6) << 8;
-	trackLen |= *(p + 7);
+	trackLen |= *reinterpret_cast<unsigned char*>(p + 4) << 24;
+	trackLen |= *reinterpret_cast<unsigned char*>(p + 5) << 16;
+	trackLen |= *reinterpret_cast<unsigned char*>(p + 6) << 8;
+	trackLen |= *reinterpret_cast<unsigned char*>(p + 7);
 	const char *nextTrack = getTrackPos(track + 1);
 	const char *trackEnd = p + 8 + trackLen;
 	if (nextTrack && nextTrack != trackEnd) throw(Exception("File inconsistent"));
@@ -237,7 +237,7 @@ std::shared_ptr<QTemporaryFile> MidiParser::withOnlyVoice(size_t track) {
 		0x00, 0x01, //Tracks
 		data.at(12), data.at(13) //Division
 	};
-	f->write(header.data(), sizeof(header));
+	f->write(header.data(), header.size());
 	if (!*f) throw(Exception("Can't write to file"));
 
 	setNoForegroundVoice();
@@ -287,7 +287,7 @@ std::shared_ptr<QTemporaryFile> MidiParser::withoutVoice(size_t track) {
 	} else {
 		--header[11];
 	}
-	f->write(reinterpret_cast<char*>(header.data()), sizeof(header));
+	f->write(reinterpret_cast<char*>(header.data()), header.size());
 	if (!*f) throw(Exception("Can't write to file"));
 
 	setNoForegroundVoice();

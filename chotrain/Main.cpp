@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	//	}
 	//}
 
-	MainWindow mainWindow("/home/johannes/Noten/Johannes/Mit_Ernst/Mit_Ernst-2.midi", 2);
+	MainWindow mainWindow("/home/johannes/Noten/Johannes/Ich glaube/Ich glaube.midi", 2);
 	//mainWindow.setStyleSheet(qss);
 	mainWindow.show();
 	return app.exec();

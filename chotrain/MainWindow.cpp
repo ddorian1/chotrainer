@@ -55,7 +55,6 @@ MainWindow::MainWindow(const std::string &midiFile, size_t ownTrack)
 	bOwnVoiceMute->setCheckable(true);
 
 	onOwnVoiceForeground();
-	//bOwnVoiceForeground->setChecked(true);
 }
 
 void MainWindow::setChecked(const QToolButton *button) {
@@ -81,6 +80,7 @@ void MainWindow::onPlayStop() {
 
 void MainWindow::onOwnVoiceOnly() {
 	setChecked(bOwnVoiceOnly);
+	midiFile = midiParser.withOnlyVoice(ownTrack);
 }
 
 void MainWindow::onOwnVoiceForeground() {
@@ -90,8 +90,10 @@ void MainWindow::onOwnVoiceForeground() {
 
 void MainWindow::onNoForeground() {
 	setChecked(bNoForeground);
+	midiFile = midiParser.withoutForegroundVoice();
 }
 
 void MainWindow::onOwnVoiceMute() {
 	setChecked(bOwnVoiceMute);
+	midiFile = midiParser.withoutVoice(ownTrack);
 }
