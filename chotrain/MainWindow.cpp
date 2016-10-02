@@ -85,8 +85,7 @@ void MainWindow::onOwnVoiceOnly() {
 
 void MainWindow::onOwnVoiceForeground() {
 	setChecked(bOwnVoiceForeground);
-	midiParser.setForegroundVoice(ownTrack);
-	midiFile = midiParser.getTmpFile();
+	midiFile = midiParser.withForegroundVoice(ownTrack);
 }
 
 void MainWindow::onNoForeground() {

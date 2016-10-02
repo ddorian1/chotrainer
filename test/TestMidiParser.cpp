@@ -34,8 +34,7 @@ void TestMain::midiParser() {
 	QTemporaryFile *tmpF2 = QTemporaryFile::createNativeFile(f2);
 
 	MidiParser mp(tmpF1->fileName().toStdString());
-	mp.setForegroundVoice(2);
-	std::shared_ptr<QTemporaryFile> tmpFile = mp.getTmpFile();
+	std::shared_ptr<QTemporaryFile> tmpFile = mp.withForegroundVoice(2);
 
 	QVERIFY(compareFiles(tmpFile->fileName().toStdString(), tmpF2->fileName().toStdString()));
 

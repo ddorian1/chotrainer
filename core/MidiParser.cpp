@@ -44,16 +44,22 @@ std::list<char*> MidiParser::getPosOfEvents(size_t track, unsigned char event, u
 	std::list<char*> events;
 
 	char *p = getTrackPos(track);
+	size_t trackLen = 0;
+	trackLen |= *(p + 4) << 24;
+	trackLen |= *(p + 5) << 16;
+	trackLen |= *(p + 6) << 8;
+	trackLen |= *(p + 7);
 	const char *nextTrack = getTrackPos(track + 1);
-	if (!nextTrack) nextTrack = data.data() + data.size();
+	const char *trackEnd = p + 8 + trackLen;
+	if (nextTrack && nextTrack != trackEnd) throw(Exception("File inconsistent"));
 
 	p += 8; //Skip "MTrk" and length
-	while (nextTrack - p > 0) {
+	while (p < trackEnd) {
 		/* Skip delta_time */
 		size_t vLengthBytes;
 		std::tie(std::ignore, vLengthBytes) = sizeTFromVLength(p);
 		p += vLengthBytes;
-		if (nextTrack - p <= 0) throw(Exception("Invalid file"));
+		if (p >= trackEnd) throw(Exception("Invalid file"));
 
 		/* Check if event matches search */
 		if (event == (*reinterpret_cast<unsigned char*>(p) & mask)) events.push_back(p);
@@ -74,7 +80,7 @@ std::list<char*> MidiParser::getPosOfEvents(size_t track, unsigned char event, u
 					default:
 						throw(Exception("Unknown event"));
 				}
-				if (nextTrack - p <= 0) throw(Exception("Invalid file"));
+				if (p >= trackEnd) throw(Exception("Invalid file"));
 				size_t length;
 				std::tie(length, vLengthBytes) = sizeTFromVLength(p);
 				p += vLengthBytes + length;
@@ -133,6 +139,7 @@ void MidiParser::setInstrumentName(size_t track, const std::string &instrumentNa
 		data.resize(data.size()
 				- oldInstNameSize - oldVLengthBytes
 				+ instrumentName.size() + newVLength.size());
+		/* old pointer invalid after expanding size */
 		instPos = getInstrumentPos(track);
 	}
 
@@ -145,7 +152,6 @@ void MidiParser::setInstrumentName(size_t track, const std::string &instrumentNa
 		data.resize(data.size()
 				- oldInstNameSize - oldVLengthBytes
 				+ instrumentName.size() + newVLength.size());
-		instPos = getInstrumentPos(track);
 	}
 
 	std::memcpy(instPos + 2, newVLength.data(), newVLength.size());
@@ -198,27 +204,114 @@ size_t MidiParser::getBytesTillEnd(const char *p) const {
 	return static_cast<size_t>(end - p);
 }
 
-void MidiParser::setForegroundVoice(size_t track) {
-	setInstrument(track, 0x35u, "voice oohs");
+size_t MidiParser::getBytesTillTrackEnd(const char *p) {
+	const char *t;
+	size_t i;
+	for (i = 0, t = getTrackPos(i); t != nullptr; ++i, t = getTrackPos(i))
+		if (t > p) return t - p;
+	return getBytesTillEnd(p);
+}
+
+void MidiParser::setNoForegroundVoice() {
 	for (size_t i = 0; getTrackPos(i) != nullptr; ++i) {
-		if (i != track) {
-			try {
-				setInstrument(i, 0x00u, "acoustic grand");
-			} catch (Exception &e) {}
-		}
+		try {
+			setInstrument(i, 0x00u, "acoustic grand");
+		} catch (Exception &e) {}
 	}
 }
 
-std::shared_ptr<QTemporaryFile> MidiParser::getTmpFile() const {
-	std::shared_ptr<QTemporaryFile> tmpFile(new QTemporaryFile(QDir::cleanPath(QString("%1/%2-XXXXXX.midi").arg(QDir::tempPath(), QCoreApplication::applicationName()))));
+void MidiParser::setForegroundVoice(size_t track) {
+	setNoForegroundVoice();
+	setInstrument(track, 0x35u, "voice oohs");
+}
+
+std::shared_ptr<QTemporaryFile> MidiParser::withOnlyVoice(size_t track) {
+	std::shared_ptr<QTemporaryFile> tmpFile;
+	std::shared_ptr<std::ofstream> f;
+	tie(tmpFile, f) = newTmpFile();
+
+	const std::vector<char> header = {
+		'M', 'T', 'h', 'd', //Type
+		0x00, 0x00, 0x00, 0x06, //Length
+		0x00, 0x01, //Format
+		0x00, 0x01, //Tracks
+		data.at(12), data.at(13) //Division
+	};
+	f->write(header.data(), sizeof(header));
+	if (!*f) throw(Exception("Can't write to file"));
+
+	setNoForegroundVoice();
+	const char *t = getTrackPos(track);
+	size_t s = getBytesTillTrackEnd(t);
+	f->write(t, s);
+	if (!*f) throw(Exception("Can't write to file"));
+
+	return tmpFile;
+}
+
+std::shared_ptr<QTemporaryFile> MidiParser::withForegroundVoice(size_t track) {
+	std::shared_ptr<QTemporaryFile> tmpFile;
+	std::shared_ptr<std::ofstream> f;
+	tie(tmpFile, f) = newTmpFile();
+
+	setForegroundVoice(track);
+	f->write(data.data(), data.size());
+	if (!*f) throw(Exception("Can't write to file"));
+
+	return tmpFile;
+}
+
+std::shared_ptr<QTemporaryFile> MidiParser::withoutForegroundVoice() {
+	std::shared_ptr<QTemporaryFile> tmpFile;
+	std::shared_ptr<std::ofstream> f;
+	tie(tmpFile, f) = newTmpFile();
+
+	setNoForegroundVoice();
+	f->write(data.data(), data.size());
+	if (!*f) throw(Exception("Can't write to file"));
+
+	return tmpFile;
+}
+
+std::shared_ptr<QTemporaryFile> MidiParser::withoutVoice(size_t track) {
+	std::shared_ptr<QTemporaryFile> tmpFile;
+	std::shared_ptr<std::ofstream> f;
+	tie(tmpFile, f) = newTmpFile();
+
+	std::vector<unsigned char> header(14);
+	std::memcpy(header.data(), data.data(), 14);
+	if (header[11] == 0x00) {
+		if (header[10] == 0x00) throw(Exception("0 tracks in file"));
+		--header[10];
+		header[11] = 0xFFu;
+	} else {
+		--header[11];
+	}
+	f->write(reinterpret_cast<char*>(header.data()), sizeof(header));
+	if (!*f) throw(Exception("Can't write to file"));
+
+	setNoForegroundVoice();
+	const char *t = getTrackPos(track);
+	f->write(data.data() + 14, t - (data.data() + 14));
+	if (!*f) throw(Exception("Can't write to file"));
+
+	const char *nextTrack = getTrackPos(track + 1);
+	if (nextTrack) {
+		f->write(nextTrack, getBytesTillEnd(nextTrack));
+		if (!*f) throw(Exception("Can't write to file"));
+	}
+
+	return tmpFile;
+}
+
+std::pair<std::shared_ptr<QTemporaryFile>, std::shared_ptr<std::ofstream>> MidiParser::newTmpFile() const {
+	auto tmpFile = std::make_shared<QTemporaryFile>(QDir::cleanPath(QString("%1/%2-XXXXXX.midi").arg(QDir::tempPath(), QCoreApplication::applicationName())));
 	tmpFile->open();
 
 	const std::string path = tmpFile->fileName().toStdString();
 
-	std::ofstream f(path, std::ofstream::binary);
-	if (!f) throw(Exception("Can't open file"));
-	f.write(data.data(), data.size());
-	if (!f) throw(Exception("Can't write to file"));
-	
-	return tmpFile;
+	auto f = std::make_shared<std::ofstream>(path, std::ofstream::binary);
+	if (!*f) throw(Exception("Can't open file"));
+
+	return std::make_pair(tmpFile, f);
 }

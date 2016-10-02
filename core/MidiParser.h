@@ -58,16 +58,23 @@ class MidiParser {
 		 */
 		size_t getBytesTillEnd(const char *p) const;
 
+		size_t getBytesTillTrackEnd(const char *p); //TODO const
+
+		void setNoForegroundVoice();
+		void setForegroundVoice(size_t track);
+
+		std::pair<std::shared_ptr<QTemporaryFile>, std::shared_ptr<std::ofstream>> newTmpFile() const;
+
 	public:
 		/**
 		 * Throws if file can't be read.
 		 */
 		MidiParser(const std::string &filePath);
-		void setForegroundVoice(size_t track);
-		void muteVoice(size_t track);
-		void unmuteAll();
 
-		std::shared_ptr<QTemporaryFile> getTmpFile() const;
+		std::shared_ptr<QTemporaryFile> withOnlyVoice(size_t track);
+		std::shared_ptr<QTemporaryFile> withForegroundVoice(size_t track);
+		std::shared_ptr<QTemporaryFile> withoutForegroundVoice();
+		std::shared_ptr<QTemporaryFile> withoutVoice(size_t track);
 };
 
 #endif //MIDI_PARSER_H
