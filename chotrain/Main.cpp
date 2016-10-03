@@ -25,7 +25,7 @@ int main(int argc, char *argv[]) {
 	//	}
 	//}
 
-	MainWindow mainWindow("/home/johannes/Noten/Johannes/Ich glaube/Ich glaube.midi", 2);
+	MainWindow mainWindow("/home/johannes/Noten/Kugelmann/Ein_feste_Burg.midi", 2);
 	//mainWindow.setStyleSheet(qss);
 	mainWindow.show();
 	return app.exec();

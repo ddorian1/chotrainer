@@ -16,8 +16,8 @@ MidiParser::MidiParser(const std::string &filePath)
 	file.seekg(0, file.end);
 	const size_t fileSize = file.tellg();
 	file.seekg(0, file.beg);
-	data = std::vector<char>(fileSize);
-	file.read(data.data(), fileSize);
+	data = std::vector<uint8_t>(fileSize);
+	file.read(reinterpret_cast<char*>(data.data()), fileSize);
 	if (!file) throw(Exception("Can't read file"));
 
 	//TODO test for file type 1
@@ -27,10 +27,10 @@ MidiParser::MidiParser(const std::string &filePath)
 	voiceMuted = std::vector<bool>(trackCount, false);
 }
 
-char* MidiParser::getTrackPos(size_t track) {
-	constexpr char trackMark[4] = {'M', 'T', 'r', 'k'};
+uint8_t* MidiParser::getTrackPos(size_t track) {
+	constexpr uint8_t trackMark[4] = {'M', 'T', 'r', 'k'};
 	size_t nextTrack = 0;
-	char *p = data.data();
+	uint8_t *p = data.data();
 	for (size_t i = 0; i < data.size() - 3; ++i, ++p) {
 		if (!std::memcmp(trackMark, p, 4)) {
 			if (nextTrack == track) return p;
@@ -40,17 +40,17 @@ char* MidiParser::getTrackPos(size_t track) {
 	return nullptr;
 }
 
-std::list<char*> MidiParser::getPosOfEvents(size_t track, unsigned char event, unsigned char mask) {
-	std::list<char*> events;
+std::list<uint8_t*> MidiParser::getPosOfEvents(size_t track, uint8_t event, uint8_t mask) {
+	std::list<uint8_t*> events;
 
-	char *p = getTrackPos(track);
+	uint8_t *p = getTrackPos(track);
 	size_t trackLen = 0;
-	trackLen |= *reinterpret_cast<unsigned char*>(p + 4) << 24;
-	trackLen |= *reinterpret_cast<unsigned char*>(p + 5) << 16;
-	trackLen |= *reinterpret_cast<unsigned char*>(p + 6) << 8;
-	trackLen |= *reinterpret_cast<unsigned char*>(p + 7);
-	const char *nextTrack = getTrackPos(track + 1);
-	const char *trackEnd = p + 8 + trackLen;
+	trackLen |= *(p + 4) << 24;
+	trackLen |= *(p + 5) << 16;
+	trackLen |= *(p + 6) << 8;
+	trackLen |= *(p + 7);
+	const uint8_t *nextTrack = getTrackPos(track + 1);
+	const uint8_t *trackEnd = p + 8 + trackLen;
 	if (nextTrack && nextTrack != trackEnd) throw(Exception("File inconsistent"));
 
 	p += 8; //Skip "MTrk" and length
@@ -62,12 +62,12 @@ std::list<char*> MidiParser::getPosOfEvents(size_t track, unsigned char event, u
 		if (p >= trackEnd) throw(Exception("Invalid file"));
 
 		/* Check if event matches search */
-		if (event == (*reinterpret_cast<unsigned char*>(p) & mask)) events.push_back(p);
+		if (event == (*p & mask)) events.push_back(p);
 
 		/* Skip event */
-		switch (*reinterpret_cast<unsigned char*>(p) & 0xF0u) {
+		switch (*p & 0xF0u) {
 			case 0xF0u:
-				switch (*reinterpret_cast<unsigned char*>(p)) {
+				switch (*p) {
 					case 0xFFu:
 						/* Meta event */
 						p += 2;
@@ -106,34 +106,34 @@ std::list<char*> MidiParser::getPosOfEvents(size_t track, unsigned char event, u
 	return events;
 }
 
-char* MidiParser::getInstrumentPos(size_t track) {
-	std::list<char*> metaEvents = getPosOfEvents(track, 0xFFu);
+uint8_t* MidiParser::getInstrumentPos(size_t track) {
+	std::list<uint8_t*> metaEvents = getPosOfEvents(track, 0xFFu);
 	for (const auto &event : metaEvents) {
-		if (*reinterpret_cast<unsigned char*>(event + 1) == 0x04u)
+		if (*(event + 1) == 0x04u)
 			return event;
 	}
 	return nullptr;
 }
 
-void MidiParser::setInstrument(size_t track, unsigned char instrumentId, const std::string &instrumentName) {
+void MidiParser::setInstrument(size_t track, uint8_t instrumentId, const std::string &instrumentName) {
 	setInstrumentName(track, instrumentName);
 	setInstrumentId(track, instrumentId);
 }
 
-void MidiParser::setInstrumentId(size_t track, unsigned char instrumentId) {
-	std::list<char*> programChangeEvents = getPosOfEvents(track, 0xC0u, 0xF0u);
+void MidiParser::setInstrumentId(size_t track, uint8_t instrumentId) {
+	std::list<uint8_t*> programChangeEvents = getPosOfEvents(track, 0xC0u, 0xF0u);
 	for (const auto &event : programChangeEvents)
-		*reinterpret_cast<unsigned char*>(event + 1) = instrumentId;
+		*(event + 1) = instrumentId;
 }
 
 void MidiParser::setInstrumentName(size_t track, const std::string &instrumentName) {
-	char *instPos = getInstrumentPos(track);
+	uint8_t *instPos = getInstrumentPos(track);
 	if (!instPos) throw(Exception("No such track"));
 
 	size_t oldInstNameSize, oldVLengthBytes;
 	std::tie(oldInstNameSize, oldVLengthBytes) = sizeTFromVLength(instPos + 2);
 
-	const std::vector<unsigned char> newVLength = sizeTToVLength(instrumentName.size());
+	const std::vector<uint8_t> newVLength = sizeTToVLength(instrumentName.size());
 
 	if (oldInstNameSize + oldVLengthBytes < instrumentName.size() + newVLength.size()) {
 		data.resize(data.size()
@@ -143,8 +143,8 @@ void MidiParser::setInstrumentName(size_t track, const std::string &instrumentNa
 		instPos = getInstrumentPos(track);
 	}
 
-	char *copyTo = instPos + 2 + newVLength.size() + instrumentName.size();
-	char *copyFrom = instPos + 2 + oldVLengthBytes + oldInstNameSize;
+	uint8_t *copyTo = instPos + 2 + newVLength.size() + instrumentName.size();
+	uint8_t *copyFrom = instPos + 2 + oldVLengthBytes + oldInstNameSize;
 	const size_t bytesToCopy = std::min(getBytesTillEnd(copyFrom), getBytesTillEnd(copyTo));
 	std::memmove(copyTo, copyFrom, bytesToCopy);
 
@@ -157,8 +157,8 @@ void MidiParser::setInstrumentName(size_t track, const std::string &instrumentNa
 	std::memcpy(instPos + 2, newVLength.data(), newVLength.size());
 	std::memcpy(instPos + 2 + newVLength.size(), instrumentName.data(), instrumentName.size());
 			
-	char *trackPos = getTrackPos(track);
-	char *nextTrackPos = getTrackPos(track + 1);
+	uint8_t *trackPos = getTrackPos(track);
+	uint8_t *nextTrackPos = getTrackPos(track + 1);
 	if (!nextTrackPos) nextTrackPos = data.data() + data.size();
 	if (nextTrackPos - trackPos < 8) throw(Exception("Invalid file"));
 	const unsigned long newTrackSize = static_cast<unsigned long>(nextTrackPos - trackPos - 8);	//TODO test for overflow
@@ -168,7 +168,7 @@ void MidiParser::setInstrumentName(size_t track, const std::string &instrumentNa
 	*(trackPos + 7) = newTrackSize & 0x000000FFlu;
 }
 
-std::pair<size_t, size_t> MidiParser::sizeTFromVLength(const char *p) const {
+std::pair<size_t, size_t> MidiParser::sizeTFromVLength(const uint8_t *p) const {
 	size_t s = 0;
 	size_t bytes = 1;
 	do {
@@ -181,15 +181,15 @@ std::pair<size_t, size_t> MidiParser::sizeTFromVLength(const char *p) const {
 	throw(Exception("End of file reached"));
 }
 
-std::vector<unsigned char> MidiParser::sizeTToVLength(size_t s) {
-	std::list<unsigned char> l;
+std::vector<uint8_t> MidiParser::sizeTToVLength(size_t s) {
+	std::list<uint8_t> l;
 	l.push_front(s & 0x7F);
 	s >>= 7;
 	while (s) {
 		l.push_front((s & 0x7F) | 0x80);
 		s >>= 7;
 	}
-	std::vector<unsigned char> v(l.size());
+	std::vector<uint8_t> v(l.size());
 	auto it = v.begin();
 	while (!l.empty()) {
 		*it = l.front();
@@ -198,14 +198,14 @@ std::vector<unsigned char> MidiParser::sizeTToVLength(size_t s) {
 	return v;
 }
 
-size_t MidiParser::getBytesTillEnd(const char *p) const {
-	const char *end = data.data() + data.size();
+size_t MidiParser::getBytesTillEnd(const uint8_t *p) const {
+	const uint8_t *end = data.data() + data.size();
 	if (p - data.data() < 0 || end - p < 1) throw(Exception("p not in data"));
 	return static_cast<size_t>(end - p);
 }
 
-size_t MidiParser::getBytesTillTrackEnd(const char *p) {
-	const char *t;
+size_t MidiParser::getBytesTillTrackEnd(const uint8_t *p) {
+	const uint8_t *t;
 	size_t i;
 	for (i = 0, t = getTrackPos(i); t != nullptr; ++i, t = getTrackPos(i))
 		if (t > p) return t - p;
@@ -230,20 +230,20 @@ std::shared_ptr<QTemporaryFile> MidiParser::withOnlyVoice(size_t track) {
 	std::shared_ptr<std::ofstream> f;
 	tie(tmpFile, f) = newTmpFile();
 
-	const std::vector<char> header = {
+	const std::vector<uint8_t> header = {
 		'M', 'T', 'h', 'd', //Type
 		0x00, 0x00, 0x00, 0x06, //Length
 		0x00, 0x01, //Format
 		0x00, 0x01, //Tracks
 		data.at(12), data.at(13) //Division
 	};
-	f->write(header.data(), header.size());
+	f->write(reinterpret_cast<const char*>(header.data()), header.size());
 	if (!*f) throw(Exception("Can't write to file"));
 
 	setNoForegroundVoice();
-	const char *t = getTrackPos(track);
+	const uint8_t *t = getTrackPos(track);
 	size_t s = getBytesTillTrackEnd(t);
-	f->write(t, s);
+	f->write(reinterpret_cast<const char*>(t), s);
 	if (!*f) throw(Exception("Can't write to file"));
 
 	return tmpFile;
@@ -255,7 +255,7 @@ std::shared_ptr<QTemporaryFile> MidiParser::withForegroundVoice(size_t track) {
 	tie(tmpFile, f) = newTmpFile();
 
 	setForegroundVoice(track);
-	f->write(data.data(), data.size());
+	f->write(reinterpret_cast<char*>(data.data()), data.size());
 	if (!*f) throw(Exception("Can't write to file"));
 
 	return tmpFile;
@@ -267,7 +267,7 @@ std::shared_ptr<QTemporaryFile> MidiParser::withoutForegroundVoice() {
 	tie(tmpFile, f) = newTmpFile();
 
 	setNoForegroundVoice();
-	f->write(data.data(), data.size());
+	f->write(reinterpret_cast<char*>(data.data()), data.size());
 	if (!*f) throw(Exception("Can't write to file"));
 
 	return tmpFile;
@@ -278,7 +278,7 @@ std::shared_ptr<QTemporaryFile> MidiParser::withoutVoice(size_t track) {
 	std::shared_ptr<std::ofstream> f;
 	tie(tmpFile, f) = newTmpFile();
 
-	std::vector<unsigned char> header(14);
+	std::vector<uint8_t> header(14);
 	std::memcpy(header.data(), data.data(), 14);
 	if (header[11] == 0x00) {
 		if (header[10] == 0x00) throw(Exception("0 tracks in file"));
@@ -291,13 +291,13 @@ std::shared_ptr<QTemporaryFile> MidiParser::withoutVoice(size_t track) {
 	if (!*f) throw(Exception("Can't write to file"));
 
 	setNoForegroundVoice();
-	const char *t = getTrackPos(track);
-	f->write(data.data() + 14, t - (data.data() + 14));
+	const uint8_t *t = getTrackPos(track);
+	f->write(reinterpret_cast<char*>(data.data() + 14), t - (data.data() + 14));
 	if (!*f) throw(Exception("Can't write to file"));
 
-	const char *nextTrack = getTrackPos(track + 1);
+	const uint8_t *nextTrack = getTrackPos(track + 1);
 	if (nextTrack) {
-		f->write(nextTrack, getBytesTillEnd(nextTrack));
+		f->write(reinterpret_cast<const char*>(nextTrack), getBytesTillEnd(nextTrack));
 		if (!*f) throw(Exception("Can't write to file"));
 	}
 
