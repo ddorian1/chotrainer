@@ -4,11 +4,13 @@ CONFIG += staticlib
 
 include(../common.pri)
 
-HEADERS +=	Exception.h \
+HEADERS +=	ChotrainParser.h \
+			Exception.h \
 			Fluidsynth.h \
 			MidiParser.h
 
-SOURCES +=	Exception.cpp \
+SOURCES +=	ChotrainParser.cpp \
+			Exception.cpp \
 			Fluidsynth.cpp \
 			MidiParser.cpp
 
