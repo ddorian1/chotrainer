@@ -13,7 +13,8 @@ include(../common.pri)
 
 HEADERS +=	TestMain.h
 
-SOURCES +=	TestFluidsynth.cpp \
+SOURCES +=	TestChotrainParser.cpp \
+			TestFluidsynth.cpp \
 			TestMain.cpp \
 			TestMidiParser.cpp
 

@@ -9,6 +9,9 @@ class ChotrainParser {
 		struct Track {
 			size_t number;
 			std::string name;
+			bool operator==(const Track &t) const {
+				return (t.number == number && t.name == name);
+			}
 		};
 
 	private:

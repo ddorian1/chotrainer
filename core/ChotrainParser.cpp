@@ -5,12 +5,13 @@
 #include <fstream>
 #include <cstring>
 
-static uint32_t btoh32(void* p) {
+static uint32_t btoh32(void* v) {
+	uint8_t *p = reinterpret_cast<uint8_t*>(v);
 	uint32_t n = 0;
-	n += *reinterpret_cast<size_t*>(p) << 24;
-	n += *reinterpret_cast<size_t*>(p) << 16;
-	n += *reinterpret_cast<size_t*>(p) << 8;
-	n += *reinterpret_cast<size_t*>(p);
+	n += static_cast<size_t>(*p) << 24;
+	n += static_cast<size_t>(*(p + 1)) << 16;
+	n += static_cast<size_t>(*(p + 2)) << 8;
+	n += static_cast<size_t>(*(p + 3));
 	return n;
 }
 
