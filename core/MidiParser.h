@@ -75,6 +75,7 @@ class MidiParser {
 		std::shared_ptr<QTemporaryFile> withForegroundVoice(size_t track);
 		std::shared_ptr<QTemporaryFile> withoutForegroundVoice();
 		std::shared_ptr<QTemporaryFile> withoutVoice(size_t track);
+		uint16_t getNumberOfMusicTracks();
 };
 
 #endif //MIDI_PARSER_H

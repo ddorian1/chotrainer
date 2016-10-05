@@ -37,6 +37,7 @@ void TestMain::midiParser() {
 	std::shared_ptr<QTemporaryFile> tmpFile = mp.withForegroundVoice(2);
 
 	QVERIFY(compareFiles(tmpFile->fileName().toStdString(), tmpF2->fileName().toStdString()));
+	QVERIFY(mp.getNumberOfMusicTracks() == 2);
 
 	delete tmpF1;
 	delete tmpF2;

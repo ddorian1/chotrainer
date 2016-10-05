@@ -7,7 +7,9 @@ CONFIG += c++11 ordered
 
 SUBDIRS =	core \
 			chotrain \
+			chotrainCreator \
 			test
 
 chotrain.depends = core
+chotrainCreator.depends = core
 test.depends = core
