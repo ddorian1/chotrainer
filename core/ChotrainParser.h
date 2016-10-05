@@ -9,7 +9,6 @@ class ChotrainParser {
 		struct Track {
 			size_t number;
 			std::string name;
-			Track() : number(0), name("") {}
 			Track(size_t a, const std::string &b) : number(a), name(b) {}
 			bool operator==(const Track &t) const {
 				return (t.number == number && t.name == name);

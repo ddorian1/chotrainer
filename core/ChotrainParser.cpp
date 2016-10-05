@@ -39,20 +39,19 @@ ChotrainParser::ChotrainParser(const std::string &filePath) {
 		throw(Exception("No support for file version"));
 
 	const uint32_t numberOfNamedTracks = btoh32(begin.data() + 5);
-	namedTracks.resize(numberOfNamedTracks);
 
 	for (size_t i = 0; i < numberOfNamedTracks; ++i) {
 		std::vector<uint8_t> data1(8);
 		f.read(reinterpret_cast<char*>(data1.data()), 8);
 		if (!f) throw(Exception("Can't read file"));
-		namedTracks[i].number = btoh32(data1.data());
-		const uint32_t trackNameLength = btoh32(data1.data() + 4);
 
+		const uint32_t trackNameLength = btoh32(data1.data() + 4);
 		std::vector<char> data2(trackNameLength + 1);
 		f.read(data2.data(), trackNameLength);
 		if (!f) throw(Exception("Can't read file"));
 		data2[trackNameLength] = '\0';
-		namedTracks[i].name = data2.data();
+
+		namedTracks.emplace_back(btoh32(data1.data()), data2.data());
 	}
 
 	std::vector<uint8_t> data(4);
