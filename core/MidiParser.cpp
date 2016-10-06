@@ -316,10 +316,10 @@ std::pair<std::shared_ptr<QTemporaryFile>, std::shared_ptr<std::ofstream>> MidiP
 	return std::make_pair(tmpFile, f);
 }
 
-uint16_t MidiParser::getNumberOfMusicTracks() {
-	size_t tracks = 0;
+std::list<size_t> MidiParser::getMusicTracks() {
+	std::list<size_t> l;
 	for (size_t i = 0; getTrackPos(i) != nullptr; ++i) {
-		if (!getPosOfEvents(i, 0xC0u, 0xF0u).empty()) ++tracks;
+		if (!getPosOfEvents(i, 0xC0u, 0xF0u).empty()) l.push_back(i);
 	}
-	return tracks;
+	return l;
 }

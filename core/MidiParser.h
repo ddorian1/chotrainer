@@ -2,6 +2,7 @@
 #define MIDI_PARSER_H
 
 #include <fstream>
+#include <list>
 #include <memory>
 #include <string>
 #include <vector>
@@ -75,7 +76,7 @@ class MidiParser {
 		std::shared_ptr<QTemporaryFile> withForegroundVoice(size_t track);
 		std::shared_ptr<QTemporaryFile> withoutForegroundVoice();
 		std::shared_ptr<QTemporaryFile> withoutVoice(size_t track);
-		uint16_t getNumberOfMusicTracks();
+		std::list<size_t> getMusicTracks();
 };
 
 #endif //MIDI_PARSER_H
