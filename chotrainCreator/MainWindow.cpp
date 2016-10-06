@@ -38,20 +38,25 @@ MainWindow::MainWindow(const std::string &midiFile)
 	const std::list<size_t> musicTracks = midiParser.getMusicTracks();
 
 	names.resize(musicTracks.size(), nullptr);
-	for (auto &n : names) n = new QLineEdit(this);
+	for (auto &n : names) {
+		n = new QLineEdit(this);
+		n->setToolTip(tr("The name of this voice"));
+	}
 	accompaniments.resize(musicTracks.size(), nullptr);
 	for (auto &a : accompaniments) {
 		a = new QCheckBox(this);
+		a->setToolTip(tr("Check if this voice is part of the accompaniment"));
 		QObject::connect(a, &QCheckBox::clicked, this, &MainWindow::onAccompaniment);
 	}
 
 	QGridLayout *grid = new QGridLayout();
 	grid->addWidget(new QLabel(tr("Name"), this), 0, 1);
-	grid->addWidget(new QLabel(tr("Is accompaniment"), this), 0, 2);
+	grid->addWidget(new QLabel(tr("Accompaniment"), this), 0, 2);
 	auto track = musicTracks.begin();
 	for (size_t i = 0; i < musicTracks.size(); ++i) {
 		PlayButton *pb = new PlayButton(this, *track);
 		++track;
+		pb->setToolTip(tr("Play this voice"));
 		QObject::connect(pb, &QToolButton::clicked, this, &MainWindow::onPlayStop);
 		QObject::connect(this, &MainWindow::playbackStopped, pb, &PlayButton::onPlaybackStopped);
 
@@ -66,16 +71,18 @@ MainWindow::MainWindow(const std::string &midiFile)
 	layout->addWidget(sep);
 
 	QHBoxLayout *l = new QHBoxLayout();
-	QPushButton *bCancel = new QPushButton(tr("Cancel"));
+	QPushButton *bClose = new QPushButton(tr("Close"));
 	QPushButton *bSave = new QPushButton(tr("Save"));
-	l->addWidget(bCancel);
+	bClose->setIcon(QIcon::fromTheme("application-exit"));
+	bSave->setIcon(QIcon::fromTheme("document-save"));
+	l->addWidget(bClose);
 	l->addWidget(bSave);
 	layout->addLayout(l);
 
 	centralWidget->setLayout(layout);
 	setCentralWidget(centralWidget);
 
-	QObject::connect(bCancel, &QPushButton::clicked, this, &QMainWindow::close);
+	QObject::connect(bClose, &QPushButton::clicked, this, &QMainWindow::close);
 	QObject::connect(bSave, &QPushButton::clicked, this, &MainWindow::onSave);
 }
 
