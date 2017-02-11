@@ -8,23 +8,30 @@
 #include <list>
 #include <tuple>
 
-MidiParser::MidiParser(const std::string &filePath)
-:
-	file(filePath, std::ifstream::binary)
-{
+std::vector<uint8_t> MidiParser::readFile(const std::string &filePath) {
+	std::ifstream file(filePath, std::ifstream::binary);
 	if (!file) throw(Exception("Can't open file"));
 	file.seekg(0, file.end);
 	const size_t fileSize = file.tellg();
 	file.seekg(0, file.beg);
-	data = std::vector<uint8_t>(fileSize);
+	std::vector<uint8_t> data(fileSize);
 	file.read(reinterpret_cast<char*>(data.data()), fileSize);
 	if (!file) throw(Exception("Can't read file"));
+	return data;
 }
+
+MidiParser::MidiParser(const std::string &filePath)
+:
+	MidiParser(readFile(filePath))
+{}
 
 MidiParser::MidiParser(const std::vector<uint8_t> &midiData)
 :
 	data(midiData)
-{}
+{
+	if (data.size() < 14) throw(Exception("Data to short"));
+	if (data[10] != 0x00u || data[11] != 0x01u) throw(Exception("Only format 1 files are supported"));
+}
 
 uint8_t* MidiParser::getTrackPos(size_t track) {
 	constexpr uint8_t trackMark[4] = {'M', 'T', 'r', 'k'};
@@ -225,6 +232,8 @@ void MidiParser::setForegroundVoice(size_t track) {
 }
 
 std::shared_ptr<QTemporaryFile> MidiParser::withOnlyVoice(size_t track) {
+	if (track == 0) throw(Exception("Only Control track makes no sence?"));
+
 	std::shared_ptr<QTemporaryFile> tmpFile;
 	std::shared_ptr<std::ofstream> f;
 	tie(tmpFile, f) = newTmpFile();
@@ -233,17 +242,20 @@ std::shared_ptr<QTemporaryFile> MidiParser::withOnlyVoice(size_t track) {
 		'M', 'T', 'h', 'd', //Type
 		0x00, 0x00, 0x00, 0x06, //Length
 		0x00, 0x01, //Format
-		0x00, 0x01, //Tracks
+		0x00, 0x02, //Tracks
 		data.at(12), data.at(13) //Division
 	};
 	f->write(reinterpret_cast<const char*>(header.data()), header.size());
 	if (!*f) throw(Exception("Can't write to file"));
 
+	std::vector<size_t> tracks = {0, track};
 	setNoForegroundVoice();
-	const uint8_t *t = getTrackPos(track);
-	size_t s = getBytesTillTrackEnd(t);
-	f->write(reinterpret_cast<const char*>(t), s);
-	if (!*f) throw(Exception("Can't write to file"));
+	for (const auto &tr : tracks) {
+		const uint8_t *t = getTrackPos(tr);
+		size_t s = getBytesTillTrackEnd(t);
+		f->write(reinterpret_cast<const char*>(t), s);
+		if (!*f) throw(Exception("Can't write to file"));
+	}
 
 	return tmpFile;
 }

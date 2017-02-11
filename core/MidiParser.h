@@ -10,7 +10,6 @@
 
 class MidiParser {
 	private:
-		std::ifstream file;
 		std::vector<uint8_t> data;
 
 		/**
@@ -64,6 +63,11 @@ class MidiParser {
 		void setForegroundVoice(size_t track);
 
 		std::pair<std::shared_ptr<QTemporaryFile>, std::shared_ptr<std::ofstream>> newTmpFile() const;
+
+		/**
+		 * Read file and return content.
+		 */
+		static std::vector<uint8_t> readFile(const std::string &filePath);
 
 	public:
 		/**
