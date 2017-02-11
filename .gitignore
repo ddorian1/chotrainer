@@ -1,0 +1,11 @@
+Makefile
+chotrain/chotrain
+moc/
+obj/
+chotrainCreator/chotrainCreator
+core/libcore.a
+qrc_core.cpp
+qrc_res.cpp
+qrc_test.cpp
+test/target_wrapper.sh
+test/test
