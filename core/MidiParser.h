@@ -12,7 +12,6 @@ class MidiParser {
 	private:
 		std::ifstream file;
 		std::vector<uint8_t> data;
-		std::vector<bool> voiceMuted;
 
 		/**
 		 * Set Instrument of track, counting tracks from 0.
@@ -71,6 +70,7 @@ class MidiParser {
 		 * Throws if file can't be read.
 		 */
 		MidiParser(const std::string &filePath);
+		MidiParser(const std::vector<uint8_t> &midiData);
 
 		std::shared_ptr<QTemporaryFile> withOnlyVoice(size_t track);
 		std::shared_ptr<QTemporaryFile> withForegroundVoice(size_t track);

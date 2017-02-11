@@ -3,10 +3,10 @@
 #include <QVBoxLayout>
 #include <QFrame>
 
-MainWindow::MainWindow(const std::string &midiFile, size_t ownTrack)
+MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 :
 	ownTrack(ownTrack),
-	midiParser(midiFile),
+	midiParser(midiData),
 	playing(false),
 	bOwnVoiceOnly(new QToolButton(this)),
 	bOwnVoiceForeground(new QToolButton(this)),

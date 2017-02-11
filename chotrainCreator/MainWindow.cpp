@@ -26,6 +26,15 @@ class PlayButton : public QToolButton {
 		void onPlaybackStopped() {setIcon(QIcon::fromTheme("media-playback-start"));};
 };
 
+class TrackName : public QLineEdit {
+	private:
+		const size_t track;
+
+	public:
+		TrackName(QWidget *parent, size_t track) : QLineEdit(parent), track(track) {};
+		size_t getTrack() const {return track;};
+};
+
 MainWindow::MainWindow(const std::string &midiFile)
 :
 	playing(false),
@@ -37,10 +46,11 @@ MainWindow::MainWindow(const std::string &midiFile)
 
 	const std::list<size_t> musicTracks = midiParser.getMusicTracks();
 
-	names.resize(musicTracks.size(), nullptr);
-	for (auto &n : names) {
-		n = new QLineEdit(this);
+	//names.resize(musicTracks.size(), nullptr);
+	for (const auto &track : musicTracks) {
+		auto n = new TrackName(this, track);
 		n->setToolTip(tr("The name of this voice"));
+		names.push_back(n);
 	}
 	accompaniments.resize(musicTracks.size(), nullptr);
 	for (auto &a : accompaniments) {
@@ -87,13 +97,13 @@ MainWindow::MainWindow(const std::string &midiFile)
 }
 
 void MainWindow::onSave() {
-	const std::string filePath = QFileDialog::getSaveFileName(nullptr, QObject::tr("Save File"), QDir::homePath(), QString("%1 (*.midi)").arg(QObject::tr("Midi file"))).toStdString();
+	const std::string filePath = QFileDialog::getSaveFileName(nullptr, QObject::tr("Save File"), QDir::homePath(), QString("%1 (*.chotrain)").arg(QObject::tr("Chotrain file"))).toStdString();
 	if (filePath == "") return;
 
 	std::vector<ChotrainParser::Track> namedTracks;
 	for (size_t i = 0; i < names.size(); ++i) {
 		if (accompaniments.at(i)->isChecked()) continue;
-		namedTracks.emplace_back(i, names.at(i)->text().toStdString());
+		namedTracks.emplace_back(names.at(i)->getTrack(), names.at(i)->text().toStdString());
 	}
 
 	//TODO get from midiParser

@@ -30,7 +30,7 @@ class MainWindow : public QMainWindow {
 		void setChecked(const QToolButton *button);
 
 	public:
-		MainWindow(const std::string &midiFile, size_t ownTrack);
+		MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack);
 
 	public slots:
 		void onPlayStop();

@@ -6,7 +6,9 @@ LIBS += ../core/libcore.a
 
 include(../common.pri)
 
-HEADERS +=	MainWindow.h
+HEADERS +=	MainWindow.h \
+			SelectVoiceDialog.h
 
 SOURCES +=	Main.cpp \
-			MainWindow.cpp
+			MainWindow.cpp \
+			SelectVoiceDialog.cpp

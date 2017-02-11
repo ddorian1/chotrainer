@@ -1,10 +1,15 @@
 #include "MainWindow.h"
+#include "SelectVoiceDialog.h"
+
+#include <ChotrainParser.h>
+#include <Exception.h>
 
 #include <QApplication>
 //#include <QFile>
 //#include <QTextStream>
 #include <QTranslator>
 //#include <QLocale>
+#include <QFileDialog>
 
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
@@ -24,8 +29,19 @@ int main(int argc, char *argv[]) {
 	//		qss = qssStream.readAll();
 	//	}
 	//}
+	const std::string filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.chotrain)").arg(QObject::tr("Chotrain file"))).toStdString();
+	if (filePath == "") return EXIT_FAILURE;
 
-	MainWindow mainWindow("/home/johannes/Noten/Kugelmann/Ein_feste_Burg.midi", 2);
+	size_t ownVoice;
+	try {
+		ownVoice = SelectVoiceDialog::getVoice(filePath);
+	} catch (const Exception &e) {
+		return EXIT_FAILURE;
+	}
+
+	ChotrainParser cp(filePath);
+
+	MainWindow mainWindow(cp.getMidiFile(), ownVoice);
 	//mainWindow.setStyleSheet(qss);
 	mainWindow.show();
 	return app.exec();

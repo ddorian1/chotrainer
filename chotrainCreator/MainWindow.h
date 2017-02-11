@@ -9,6 +9,8 @@
 #include <QLineEdit>
 #include <string>
 
+class TrackName;
+
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 
@@ -18,7 +20,7 @@ class MainWindow : public QMainWindow {
 		MidiParser midiParser;
 		Fluidsynth fluidsynth;
 		std::shared_ptr<QTemporaryFile> midiFile;
-		std::vector<QLineEdit*> names;
+		std::vector<TrackName*> names;
 		std::vector<QCheckBox*>	accompaniments;
 
 		void closeEvent(QCloseEvent *event) override;

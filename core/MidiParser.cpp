@@ -19,13 +19,12 @@ MidiParser::MidiParser(const std::string &filePath)
 	data = std::vector<uint8_t>(fileSize);
 	file.read(reinterpret_cast<char*>(data.data()), fileSize);
 	if (!file) throw(Exception("Can't read file"));
-
-	//TODO test for file type 1
-
-	size_t trackCount = 0;
-	while (getTrackPos(trackCount) != nullptr) ++trackCount;
-	voiceMuted = std::vector<bool>(trackCount, false);
 }
+
+MidiParser::MidiParser(const std::vector<uint8_t> &midiData)
+:
+	data(midiData)
+{}
 
 uint8_t* MidiParser::getTrackPos(size_t track) {
 	constexpr uint8_t trackMark[4] = {'M', 'T', 'r', 'k'};
