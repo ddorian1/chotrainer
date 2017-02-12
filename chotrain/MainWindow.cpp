@@ -2,6 +2,7 @@
 
 #include <QVBoxLayout>
 #include <QFrame>
+#include <QLabel>
 
 MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 :
@@ -21,11 +22,19 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	QFrame *sep = new QFrame(this);
 	sep->setFrameShape(QFrame::HLine);
 
+	QHBoxLayout *barLayout = new QHBoxLayout();
+	QLabel *barLabel = new QLabel(tr("From bar"), this);
+	barLabel->setAlignment(Qt::AlignRight);
+	barLayout->addWidget(barLabel, Qt::AlignRight);
+	barLayout->addWidget(sBar, Qt::AlignLeft);
+	sBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+	barLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
 	layout->addWidget(bOwnVoiceOnly);
 	layout->addWidget(bOwnVoiceForeground);
 	layout->addWidget(bNoForeground);
 	layout->addWidget(bOwnVoiceMute);
-	layout->addWidget(sBar);
+	layout->addLayout(barLayout);
 	layout->addWidget(sep);
 	layout->addWidget(bPlayStop);
 	layout->setAlignment(bPlayStop, Qt::AlignHCenter);

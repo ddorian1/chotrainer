@@ -3,6 +3,7 @@
 #include <ChotrainParser.h>
 #include <Exception.h>
 
+#include <QFrame>
 #include <QPushButton>
 #include <QVBoxLayout>
 
@@ -29,11 +30,6 @@ SelectVoiceDialog::SelectVoiceDialog(const std::string &chotrainFilePath)
 		QObject::connect(b, &QPushButton::clicked, this, &SelectVoiceDialog::onSetTrack);
 		layout->addWidget(b);
 	}
-
-	QPushButton *bClose = new QPushButton(tr("Close"));
-	bClose->setIcon(QIcon::fromTheme("application-exit"));
-	QObject::connect(bClose, &QPushButton::clicked, this, &QDialog::close);
-	layout->addWidget(bClose);
 
 	setLayout(layout);
 }

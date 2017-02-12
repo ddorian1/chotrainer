@@ -14,6 +14,7 @@
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
 	app.setApplicationName("chotrain");
+	app.setWindowIcon(QIcon(":/icon"));
 	QTranslator translator;
 
 	//QString filename = QString("chordival_%1").arg(QLocale::system().name());
