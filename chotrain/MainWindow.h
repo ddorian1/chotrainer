@@ -4,11 +4,12 @@
 #include <Fluidsynth.h>
 #include <MidiParser.h>
 
-#include <memory>
 #include <QMainWindow>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QTemporaryFile>
 #include <QToolButton>
+#include <memory>
 #include <string>
 
 class MainWindow : public QMainWindow {
@@ -25,9 +26,11 @@ class MainWindow : public QMainWindow {
 		QToolButton *bOwnVoiceForeground;
 		QToolButton *bNoForeground;
 		QToolButton *bOwnVoiceMute;
+		QSpinBox *sBar;
 		QPushButton *bPlayStop;
 		
 		void setChecked(const QToolButton *button);
+		void updateMidiFile();
 
 	public:
 		MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack);
