@@ -12,6 +12,7 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	bOwnVoiceForeground(new QToolButton(this)),
 	bNoForeground(new QToolButton(this)),
 	bOwnVoiceMute(new QToolButton(this)),
+	sBar(new QSpinBox(this)),
 	bPlayStop(new QPushButton(this))
 {
 	QWidget *centralWidget = new QWidget(this);
@@ -24,6 +25,7 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	layout->addWidget(bOwnVoiceForeground);
 	layout->addWidget(bNoForeground);
 	layout->addWidget(bOwnVoiceMute);
+	layout->addWidget(sBar);
 	layout->addWidget(sep);
 	layout->addWidget(bPlayStop);
 	layout->setAlignment(bPlayStop, Qt::AlignHCenter);
@@ -54,6 +56,9 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	bNoForeground->setCheckable(true);
 	bOwnVoiceMute->setCheckable(true);
 
+	sBar->setMinimum(1);
+	sBar->setValue(1);
+
 	onOwnVoiceForeground();
 }
 
@@ -70,6 +75,7 @@ void MainWindow::onPlayStop() {
 		bPlayStop->setText(tr("Play"));
 		bPlayStop->setIcon(QIcon::fromTheme("media-playback-start"));
 	} else {
+		updateMidiFile();
 		fluidsynth.play(midiFile->fileName().toStdString());
 		bPlayStop->setText(tr("Stop"));
 		bPlayStop->setIcon(QIcon::fromTheme("media-playback-stop"));
@@ -78,22 +84,42 @@ void MainWindow::onPlayStop() {
 	playing = !playing;
 }
 
+void MainWindow::updateMidiFile() {
+	static QToolButton *lastChecked = nullptr;
+	static int lastBar = -1;
+
+	if (lastChecked) {
+		if (lastChecked->isChecked() && lastBar == sBar->value()) return;
+	}
+	lastBar = sBar->value();
+
+	if (bOwnVoiceOnly->isChecked()) {
+		midiFile = midiParser.withOnlyVoice(ownTrack, sBar->value() - 1);
+		lastChecked = bOwnVoiceOnly;
+	} else if (bOwnVoiceForeground->isChecked()) {
+		midiFile = midiParser.withForegroundVoice(ownTrack, sBar->value() - 1);
+		lastChecked = bOwnVoiceForeground;
+	} else if (bNoForeground->isChecked()) {
+		midiFile = midiParser.withoutForegroundVoice(sBar->value() - 1);
+		lastChecked = bNoForeground;
+	} else if (bOwnVoiceMute->isChecked()) {
+		midiFile = midiParser.withoutVoice(ownTrack, sBar->value() - 1);
+		lastChecked = bOwnVoiceMute;
+	}
+}
+
 void MainWindow::onOwnVoiceOnly() {
 	setChecked(bOwnVoiceOnly);
-	midiFile = midiParser.withOnlyVoice(ownTrack);
 }
 
 void MainWindow::onOwnVoiceForeground() {
 	setChecked(bOwnVoiceForeground);
-	midiFile = midiParser.withForegroundVoice(ownTrack);
 }
 
 void MainWindow::onNoForeground() {
 	setChecked(bNoForeground);
-	midiFile = midiParser.withoutForegroundVoice();
 }
 
 void MainWindow::onOwnVoiceMute() {
 	setChecked(bOwnVoiceMute);
-	midiFile = midiParser.withoutVoice(ownTrack);
 }
