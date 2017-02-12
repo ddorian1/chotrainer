@@ -91,6 +91,12 @@ void MainWindow::onPlayStop() {
 	}
 
 	playing = !playing;
+
+	bOwnVoiceOnly->setEnabled(!playing);
+	bOwnVoiceForeground->setEnabled(!playing);
+	bNoForeground->setEnabled(!playing);
+	bOwnVoiceMute->setEnabled(!playing);
+	sBar->setEnabled(!playing);
 }
 
 void MainWindow::updateMidiFile() {

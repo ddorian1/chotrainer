@@ -4,7 +4,7 @@
 //#include <QFile>
 //#include <QTextStream>
 #include <QTranslator>
-//#include <QLocale>
+#include <QLocale>
 
 #include <QFileDialog>
 #include <QDir>
@@ -15,9 +15,10 @@ int main(int argc, char *argv[]) {
 	app.setWindowIcon(QIcon(":/icon"));
 	QTranslator translator;
 
-	//QString filename = QString("chordival_%1").arg(QLocale::system().name());
-	//QString dir(":");
-	//translator.load(filename, dir);
+	Q_INIT_RESOURCE(intl);
+	QString filename = QString("chotrain_%1").arg(QLocale::system().name());
+	QString dir(":");
+	translator.load(filename, dir);
 	app.installTranslator(&translator);
 
 	//QString qss;

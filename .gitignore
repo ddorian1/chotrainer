@@ -7,5 +7,7 @@ core/libcore.a
 qrc_core.cpp
 qrc_res.cpp
 qrc_test.cpp
+qrc_intl.cpp
 test/target_wrapper.sh
 test/test
+intl/*.qm

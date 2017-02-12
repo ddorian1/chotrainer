@@ -14,4 +14,5 @@ SOURCES +=	ChotrainParser.cpp \
 			Fluidsynth.cpp \
 			MidiParser.cpp
 
-RESOURCES += res/core.qrc
+RESOURCES += res/core.qrc \
+             ../intl/intl.qrc

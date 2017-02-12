@@ -10,6 +10,8 @@ SUBDIRS =	core \
 			chotrainCreator \
 			test
 
+TRANSLATIONS += intl/chotrain_de.ts
+
 chotrain.depends = core
 chotrainCreator.depends = core
 test.depends = core
