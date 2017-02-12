@@ -136,7 +136,7 @@ unsigned long long MidiParser::ticksTillBar(size_t bar) {
 	unsigned long long ticks = 0;
 
 	for (const auto &event : metaEvents) {
-		if (event.ptr[1] != 0x58u || event.ptr[2] != 0x04u) continue;
+		if (event.ptr && (event.ptr[1] != 0x58u || event.ptr[2] != 0x04u)) continue;
 
 		if (lastTimeSignature.ptr == nullptr) {
 			if (event.tick != 0) throw(Exception("No time signature specified"));
@@ -373,6 +373,14 @@ void MidiParser::writeTrack(std::shared_ptr<std::ofstream> f, size_t track, size
 		tmp.reserve(length);
 		std::list<Event> events = getEvents(track, 0x00u, 0x00u);
 		for (auto event = events.begin(); event != events.end(); ++event) {
+			/* Skip note on events */
+			if ((*(event->ptr) & 0xF0u) == 0x90u) {
+				auto nextEvent = event;
+				++nextEvent;
+				if (nextEvent->tick <= fromTick) continue;
+				//TODO check if nextEvent is note on/off event?
+			}
+
 			/* Add delta time */
 			if (event->tick < fromTick) {
 				tmp.push_back(0x00u);
