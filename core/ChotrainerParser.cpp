@@ -1,4 +1,4 @@
-#include "ChotrainParser.h"
+#include "ChotrainerParser.h"
 #include "Exception.h"
 
 #include <array>
@@ -24,7 +24,7 @@ static std::array<uint8_t, 4> htob32(uint32_t n) {
 	return a;
 }
 
-ChotrainParser::ChotrainParser(const std::string &filePath) {
+ChotrainerParser::ChotrainerParser(const std::string &filePath) {
 	std::ifstream f(filePath, std::ifstream::binary);
 	if (!f) throw(Exception("Can't open file"));
 
@@ -64,7 +64,7 @@ ChotrainParser::ChotrainParser(const std::string &filePath) {
 	if (!f) throw(Exception("Can't read file"));
 }	
 
-void ChotrainParser::createNewFile(const std::vector<Track> &namedTracks, const std::vector<uint8_t> &midiFile, const std::string &filePath) {
+void ChotrainerParser::createNewFile(const std::vector<Track> &namedTracks, const std::vector<uint8_t> &midiFile, const std::string &filePath) {
 	std::ofstream f(filePath, std::ofstream::binary);
 	if (!f) throw(Exception("Can't open file"));
 
@@ -96,10 +96,10 @@ void ChotrainParser::createNewFile(const std::vector<Track> &namedTracks, const 
 	f.write(reinterpret_cast<const char*>(midiFile.data()), midiFile.size());
 }
 
-std::vector<ChotrainParser::Track> ChotrainParser::getNamedTracks() const {
+std::vector<ChotrainerParser::Track> ChotrainerParser::getNamedTracks() const {
 	return namedTracks;
 }
 
-std::vector<uint8_t> ChotrainParser::getMidiFile() const {
+std::vector<uint8_t> ChotrainerParser::getMidiFile() const {
 	return midiFile;
 }

@@ -65,7 +65,7 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	bNoForeground->setCheckable(true);
 	bOwnVoiceMute->setCheckable(true);
 
-	sBar->setMinimum(1);
+	sBar->setRange(1, 9999);
 	sBar->setValue(1);
 
 	onOwnVoiceForeground();

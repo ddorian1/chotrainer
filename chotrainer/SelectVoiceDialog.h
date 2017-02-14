@@ -11,7 +11,7 @@ class SelectVoiceDialog : public QDialog {
 		size_t track;
 
 	public:
-		SelectVoiceDialog(const std::string &chotrainFilePath);
+		SelectVoiceDialog(const std::string &chotrainerFilePath);
 		size_t getTrack() const;
 		static size_t getVoice(const std::string &midiFilePath);
 

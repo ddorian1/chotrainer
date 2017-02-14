@@ -1,10 +1,10 @@
 #include "TestMain.h"
 
-#include <ChotrainParser.h>
+#include <ChotrainerParser.h>
 
 #include <vector>
 
-void TestMain::chotrainParser() {
+void TestMain::chotrainerParser() {
 	QFile f(":/MidiParserSetInstrument1.midi");
 	QVERIFY(f.open(QIODevice::ReadOnly));
 		
@@ -15,12 +15,12 @@ void TestMain::chotrainParser() {
 
 	QTemporaryFile tmp;
 	tmp.open();
-	const ChotrainParser::Track t1 = {1, "Sopran"};
-	const ChotrainParser::Track t2 = {2, "Alt"};
-	const std::vector<ChotrainParser::Track> namedTracks = {t1, t2};
-	ChotrainParser::createNewFile(namedTracks, midiFile, tmp.fileName().toStdString());
+	const ChotrainerParser::Track t1 = {1, "Sopran"};
+	const ChotrainerParser::Track t2 = {2, "Alt"};
+	const std::vector<ChotrainerParser::Track> namedTracks = {t1, t2};
+	ChotrainerParser::createNewFile(namedTracks, midiFile, tmp.fileName().toStdString());
 
-	ChotrainParser cp(tmp.fileName().toStdString());
+	ChotrainerParser cp(tmp.fileName().toStdString());
 
 	QVERIFY(namedTracks == cp.getNamedTracks());
 	QVERIFY(midiFile == cp.getMidiFile());

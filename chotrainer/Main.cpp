@@ -1,7 +1,7 @@
 #include "MainWindow.h"
 #include "SelectVoiceDialog.h"
 
-#include <ChotrainParser.h>
+#include <ChotrainerParser.h>
 #include <Exception.h>
 
 #include <QApplication>
@@ -13,12 +13,12 @@
 
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
-	app.setApplicationName("chotrain");
+	app.setApplicationName("Chotrainer");
 	app.setWindowIcon(QIcon(":/icon"));
 	QTranslator translator;
 
 	Q_INIT_RESOURCE(intl);
-	QString filename = QString("chotrain_%1").arg(QLocale::system().name());
+	QString filename = QString("chotrainer_%1").arg(QLocale::system().name());
 	QString dir(":");
 	translator.load(filename, dir);
 	app.installTranslator(&translator);
@@ -31,7 +31,7 @@ int main(int argc, char *argv[]) {
 	//		qss = qssStream.readAll();
 	//	}
 	//}
-	const std::string filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.chotrain)").arg(QObject::tr("Chotrain file"))).toStdString();
+	const std::string filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.chotrainer)").arg(QObject::tr("Chotrainer file"))).toStdString();
 	if (filePath == "") return EXIT_FAILURE;
 
 	size_t ownVoice;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
 		return EXIT_FAILURE;
 	}
 
-	ChotrainParser cp(filePath);
+	ChotrainerParser cp(filePath);
 
 	MainWindow mainWindow(cp.getMidiFile(), ownVoice);
 	//mainWindow.setStyleSheet(qss);

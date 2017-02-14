@@ -11,12 +11,12 @@
 
 int main(int argc, char *argv[]) {
 	QApplication app(argc, argv);
-	app.setApplicationName("chotrain creator");
+	app.setApplicationName("Chotrainer Creator");
 	app.setWindowIcon(QIcon(":/icon"));
 	QTranslator translator;
 
 	Q_INIT_RESOURCE(intl);
-	QString filename = QString("chotrain_%1").arg(QLocale::system().name());
+	QString filename = QString("chotrainer_%1").arg(QLocale::system().name());
 	QString dir(":");
 	translator.load(filename, dir);
 	app.installTranslator(&translator);

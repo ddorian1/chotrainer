@@ -1,8 +1,8 @@
 Makefile
-chotrain/chotrain
+chotrainer/chotrainer
 moc/
 obj/
-chotrainCreator/chotrainCreator
+chotrainerCreator/chotrainerCreator
 core/libcore.a
 qrc_core.cpp
 qrc_res.cpp

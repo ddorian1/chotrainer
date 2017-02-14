@@ -1,6 +1,6 @@
 #include "MainWindow.h"
 
-#include <ChotrainParser.h>
+#include <ChotrainerParser.h>
 
 #include <QCloseEvent>
 #include <QCoreApplication>
@@ -97,10 +97,10 @@ MainWindow::MainWindow(const std::string &midiFile)
 }
 
 void MainWindow::onSave() {
-	const std::string filePath = QFileDialog::getSaveFileName(nullptr, QObject::tr("Save File"), QDir::homePath(), QString("%1 (*.chotrain)").arg(QObject::tr("Chotrain file"))).toStdString();
+	const std::string filePath = QFileDialog::getSaveFileName(nullptr, QObject::tr("Save File"), QDir::homePath(), QString("%1 (*.chotrainer)").arg(QObject::tr("Chotrainer file"))).toStdString();
 	if (filePath == "") return;
 
-	std::vector<ChotrainParser::Track> namedTracks;
+	std::vector<ChotrainerParser::Track> namedTracks;
 	for (size_t i = 0; i < names.size(); ++i) {
 		if (accompaniments.at(i)->isChecked()) continue;
 		namedTracks.emplace_back(names.at(i)->getTrack(), names.at(i)->text().toStdString());
@@ -113,7 +113,7 @@ void MainWindow::onSave() {
 	f.seekg(0, f.beg);
 	f.read(reinterpret_cast<char*>(data.data()), data.size());
 
-	ChotrainParser::createNewFile(namedTracks, data, filePath);
+	ChotrainerParser::createNewFile(namedTracks, data, filePath);
 }
 
 void MainWindow::onAccompaniment() {

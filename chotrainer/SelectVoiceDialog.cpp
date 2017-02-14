@@ -1,6 +1,6 @@
 #include "SelectVoiceDialog.h"
 
-#include <ChotrainParser.h>
+#include <ChotrainerParser.h>
 #include <Exception.h>
 
 #include <QFrame>
@@ -17,14 +17,14 @@ class VoiceButton : public QPushButton {
 		size_t getTrack() const {return track;};
 };
 
-SelectVoiceDialog::SelectVoiceDialog(const std::string &chotrainFilePath)
+SelectVoiceDialog::SelectVoiceDialog(const std::string &chotrainerFilePath)
 :
 	trackSet(false)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
 
-	ChotrainParser cp(chotrainFilePath);
-	const std::vector<ChotrainParser::Track> namedTracks = cp.getNamedTracks();
+	ChotrainerParser cp(chotrainerFilePath);
+	const std::vector<ChotrainerParser::Track> namedTracks = cp.getNamedTracks();
 	for (const auto &track : namedTracks) {
 		VoiceButton *b = new VoiceButton(QString::fromStdString(track.name), this, track.number);
 		QObject::connect(b, &QPushButton::clicked, this, &SelectVoiceDialog::onSetTrack);
