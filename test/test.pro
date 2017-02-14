@@ -2,7 +2,8 @@ QT += testlib
 TEMPLATE = app
 TARGET = test
 INCLUDEPATH += ../core
-LIBS += ../core/libcore.a
+LIBPATH += ../core
+LIBS += -lcore
 CONFIG += testcase
 
 include(../common.pri)

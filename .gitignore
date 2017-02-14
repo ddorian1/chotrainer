@@ -3,7 +3,7 @@ chotrainer/chotrainer
 moc/
 obj/
 chotrainerCreator/chotrainerCreator
-core/libcore.a
+core/libcore.so*
 qrc_core.cpp
 qrc_res.cpp
 qrc_test.cpp
