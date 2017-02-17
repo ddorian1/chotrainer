@@ -10,12 +10,14 @@
 #include <QDir>
 
 int main(int argc, char *argv[]) {
+	Q_INIT_RESOURCE(core);
+	Q_INIT_RESOURCE(intl);
+
 	QApplication app(argc, argv);
 	app.setApplicationName("Chotrainer Creator");
 	app.setWindowIcon(QIcon(":/icon"));
 	QTranslator translator;
 
-	Q_INIT_RESOURCE(intl);
 	QString filename = QString("chotrainer_%1").arg(QLocale::system().name());
 	QString dir(":");
 	translator.load(filename, dir);

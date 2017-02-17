@@ -2,7 +2,7 @@ QT += testlib
 TEMPLATE = app
 TARGET = test
 INCLUDEPATH += ../core
-LIBPATH += ../core
+LIBPATH += ../core ../core/release
 LIBS += -lcore
 CONFIG += testcase
 

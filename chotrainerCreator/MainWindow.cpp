@@ -20,10 +20,10 @@ class PlayButton : public QToolButton {
 	public:
 		PlayButton(QWidget *parent, size_t track) : QToolButton(parent), track(track) {onPlaybackStopped();};
 		size_t getTrack() const {return track;};
-		void onPlaybackStarted() {setIcon(QIcon::fromTheme("media-playback-stop"));};
+		void onPlaybackStarted() {setIcon(QIcon::fromTheme("media-playback-stop", QIcon(":/icons/media-playback-stop")));};
 
 	public slots:
-		void onPlaybackStopped() {setIcon(QIcon::fromTheme("media-playback-start"));};
+		void onPlaybackStopped() {setIcon(QIcon::fromTheme("media-playback-start", QIcon(":/icons/media-playback-start")));};
 };
 
 class TrackName : public QLineEdit {
@@ -83,8 +83,8 @@ MainWindow::MainWindow(const std::string &midiFile)
 	QHBoxLayout *l = new QHBoxLayout();
 	QPushButton *bClose = new QPushButton(tr("Close"));
 	QPushButton *bSave = new QPushButton(tr("Save"));
-	bClose->setIcon(QIcon::fromTheme("application-exit"));
-	bSave->setIcon(QIcon::fromTheme("document-save"));
+	bClose->setIcon(QIcon::fromTheme("application-exit", QIcon(":/icons/application-exit")));
+	bSave->setIcon(QIcon::fromTheme("document-save", QIcon(":icons/document-save")));
 	l->addWidget(bClose);
 	l->addWidget(bSave);
 	layout->addLayout(l);

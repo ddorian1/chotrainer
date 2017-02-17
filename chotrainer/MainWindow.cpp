@@ -52,7 +52,7 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	bNoForeground->setText(tr("Don't emphatize my voice"));
 	bOwnVoiceMute->setText(tr("Mute my voice"));
 	bPlayStop->setText(tr("Play"));
-	bPlayStop->setIcon(QIcon::fromTheme("media-playback-start"));
+	bPlayStop->setIcon(QIcon::fromTheme("media-playback-start", QIcon(":/icons/media-playback-start")));
 
 	QObject::connect(bOwnVoiceOnly, &QToolButton::clicked, this, &MainWindow::onOwnVoiceOnly);
 	QObject::connect(bOwnVoiceForeground, &QToolButton::clicked, this, &MainWindow::onOwnVoiceForeground);
@@ -82,12 +82,12 @@ void MainWindow::onPlayStop() {
 	if (playing) {
 		fluidsynth.stop();
 		bPlayStop->setText(tr("Play"));
-		bPlayStop->setIcon(QIcon::fromTheme("media-playback-start"));
+		bPlayStop->setIcon(QIcon::fromTheme("media-playback-start", QIcon(":/icons/media-playback-start")));
 	} else {
 		updateMidiFile();
 		fluidsynth.play(midiFile->fileName().toStdString());
 		bPlayStop->setText(tr("Stop"));
-		bPlayStop->setIcon(QIcon::fromTheme("media-playback-stop"));
+		bPlayStop->setIcon(QIcon::fromTheme("media-playback-stop", QIcon(":/icons/media-plaback-stop")));
 	}
 
 	playing = !playing;

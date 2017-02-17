@@ -2,7 +2,7 @@ QT += widgets
 TEMPLATE = app
 TARGET = chotrainer
 INCLUDEPATH += ../core
-LIBPATH += ../core
+LIBPATH += ../core ../core/release
 LIBS += -lcore
 
 include(../common.pri)
