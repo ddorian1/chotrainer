@@ -1,8 +1,7 @@
 #include "MainWindow.h"
+#include <Exception.h>
 
 #include <QApplication>
-//#include <QFile>
-//#include <QTextStream>
 #include <QTranslator>
 #include <QLocale>
 
@@ -23,29 +22,22 @@ int main(int argc, char *argv[]) {
 	translator.load(filename, dir);
 	app.installTranslator(&translator);
 
-	//QString qss;
-	//{
-	//	QFile qssFile(":/main.qss");
-	//	if (qssFile.open(QFile::ReadOnly)) {
-	//		QTextStream qssStream(&qssFile);
-	//		qss = qssStream.readAll();
-	//	}
-	//}
-	
-	/*
+	QStringList arguments = app.arguments();
 	std::string filePath;
-	QFileDialog fd(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.midi)").arg(QObject::tr("Midi file")));
-	fd.setFileMode(QFileDialog::ExistingFile);
-	if (!fd.exec()) {
-		return EXIT_FAILURE;
+	if (arguments.length() < 2) {
+		filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.midi)").arg(QObject::tr("Midi file"))).toStdString();
+		if (filePath == "") return EXIT_FAILURE;
+	} else {
+		filePath = arguments.at(1).toStdString();
 	}
-	QStringList f = fd->selectedFiles();
-	*/
-	const std::string filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.midi)").arg(QObject::tr("Midi file"))).toStdString();
-	if (filePath == "") return EXIT_FAILURE;
 
-	MainWindow mainWindow(filePath);
-	//mainWindow.setStyleSheet(qss);
-	mainWindow.show();
-	return app.exec();
+	try {
+		MainWindow mainWindow(filePath);
+		mainWindow.show();
+		return app.exec();
+	} catch (const Exception &e) {
+		//TODO show error
+	}
+
+	return EXIT_FAILURE;
 }

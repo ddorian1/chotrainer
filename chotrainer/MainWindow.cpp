@@ -1,8 +1,10 @@
 #include "MainWindow.h"
 
-#include <QVBoxLayout>
+#include <QCloseEvent>
+#include <QCoreApplication>
 #include <QFrame>
 #include <QLabel>
+#include <QVBoxLayout>
 
 MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 :
@@ -137,4 +139,9 @@ void MainWindow::onNoForeground() {
 
 void MainWindow::onOwnVoiceMute() {
 	setChecked(bOwnVoiceMute);
+}
+
+void MainWindow::closeEvent(QCloseEvent *event) {
+	event->accept();
+	QCoreApplication::instance()->quit();
 }

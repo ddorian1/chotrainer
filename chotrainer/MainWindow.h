@@ -32,6 +32,8 @@ class MainWindow : public QMainWindow {
 		void setChecked(const QToolButton *button);
 		void updateMidiFile();
 
+		void closeEvent(QCloseEvent *event) override;
+
 	public:
 		MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack);
 

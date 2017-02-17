@@ -35,6 +35,8 @@ void Fluidsynth::play(const std::string &filePath) {
 }
 
 void Fluidsynth::stop() {
+	fluid_player_stop(player);
+	fluid_synth_system_reset(synth);
 	delete_fluid_player(player);
 	player = new_fluid_player(synth);
 }

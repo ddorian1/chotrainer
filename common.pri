@@ -1,5 +1,5 @@
 QT += core
-CONFIG += debug
+#CONFIG += debug
 QMAKE_CXXFLAGS_DEBUG += -g -Wall -Wextra -Werror
 LIBS += -lfluidsynth
 MOC_DIR = moc

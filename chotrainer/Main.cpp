@@ -5,8 +5,6 @@
 #include <Exception.h>
 
 #include <QApplication>
-//#include <QFile>
-//#include <QTextStream>
 #include <QTranslator>
 #include <QLocale>
 #include <QFileDialog>
@@ -25,28 +23,26 @@ int main(int argc, char *argv[]) {
 	translator.load(filename, dir);
 	app.installTranslator(&translator);
 
-	//QString qss;
-	//{
-	//	QFile qssFile(":/main.qss");
-	//	if (qssFile.open(QFile::ReadOnly)) {
-	//		QTextStream qssStream(&qssFile);
-	//		qss = qssStream.readAll();
-	//	}
-	//}
-	const std::string filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.chotrainer)").arg(QObject::tr("Chotrainer file"))).toStdString();
-	if (filePath == "") return EXIT_FAILURE;
+	QStringList arguments = app.arguments();
+	std::string filePath;
+	if (arguments.length() < 2) {
+		filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.chotrainer)").arg(QObject::tr("Chotrainer file"))).toStdString();
+		if (filePath == "") return EXIT_FAILURE;
+	} else {
+		filePath = arguments.at(1).toStdString();
+	}
 
 	size_t ownVoice;
 	try {
 		ownVoice = SelectVoiceDialog::getVoice(filePath);
 	} catch (const Exception &e) {
+		//TODO show error
 		return EXIT_FAILURE;
 	}
 
 	ChotrainerParser cp(filePath);
 
 	MainWindow mainWindow(cp.getMidiFile(), ownVoice);
-	//mainWindow.setStyleSheet(qss);
 	mainWindow.show();
 	return app.exec();
 }

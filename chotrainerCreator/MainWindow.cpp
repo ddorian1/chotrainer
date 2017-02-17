@@ -5,13 +5,13 @@
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDir>
-#include <QLabel>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QToolButton>
 #include <QFileDialog>
 #include <QFrame>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QToolButton>
+#include <QVBoxLayout>
 
 class PlayButton : public QToolButton {
 	private:
@@ -144,4 +144,3 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 	event->accept();
 	QCoreApplication::instance()->quit();
 }
-
