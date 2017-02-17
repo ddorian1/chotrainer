@@ -105,6 +105,7 @@ MainWindow::MainWindow(const std::string &midiFile)
 
 	QObject::connect(bClose, &QPushButton::clicked, this, &QMainWindow::close);
 	QObject::connect(bSave, &QPushButton::clicked, this, &MainWindow::onSave);
+	QObject::connect(&fluidsynth, &Fluidsynth::playbackStopped, this, &MainWindow::onPlayStop);
 }
 
 void MainWindow::onSave() {

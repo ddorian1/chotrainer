@@ -61,6 +61,7 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	QObject::connect(bNoForeground, &QToolButton::clicked, this, &MainWindow::onNoForeground);
 	QObject::connect(bOwnVoiceMute, &QToolButton::clicked, this, &MainWindow::onOwnVoiceMute);
 	QObject::connect(bPlayStop, &QPushButton::clicked, this, &MainWindow::onPlayStop);
+	connect(&fluidsynth, &Fluidsynth::playbackStopped, this, &MainWindow::onPlayStop);
 
 	bOwnVoiceOnly->setCheckable(true);
 	bOwnVoiceForeground->setCheckable(true);
