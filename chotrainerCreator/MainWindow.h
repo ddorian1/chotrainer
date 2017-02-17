@@ -35,6 +35,7 @@ class MainWindow : public QMainWindow {
 
 	signals:
 		void playbackStopped();
+		void playbackStarted(const QObject *clickedButton);
 };
 
 #endif //MAIN_WINDOW_H

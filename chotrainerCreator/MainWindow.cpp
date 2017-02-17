@@ -20,10 +20,20 @@ class PlayButton : public QToolButton {
 	public:
 		PlayButton(QWidget *parent, size_t track) : QToolButton(parent), track(track) {onPlaybackStopped();};
 		size_t getTrack() const {return track;};
-		void onPlaybackStarted() {setIcon(QIcon::fromTheme("media-playback-stop", QIcon(":/icons/media-playback-stop")));};
 
 	public slots:
-		void onPlaybackStopped() {setIcon(QIcon::fromTheme("media-playback-start", QIcon(":/icons/media-playback-start")));};
+		void onPlaybackStarted(const QObject *clickedButton) {
+			if (dynamic_cast<const PlayButton*>(clickedButton) == this) {
+				setIcon(QIcon::fromTheme("media-playback-stop", QIcon(":/icons/media-playback-stop")));
+			} else {
+				setEnabled(false);
+			}
+		};
+
+		void onPlaybackStopped() {
+			setIcon(QIcon::fromTheme("media-playback-start", QIcon(":/icons/media-playback-start")));
+			setEnabled(true);
+		};
 };
 
 class TrackName : public QLineEdit {
@@ -46,7 +56,7 @@ MainWindow::MainWindow(const std::string &midiFile)
 
 	const std::list<size_t> musicTracks = midiParser.getMusicTracks();
 
-	//names.resize(musicTracks.size(), nullptr);
+	names.reserve(musicTracks.size());
 	for (const auto &track : musicTracks) {
 		auto n = new TrackName(this, track);
 		n->setToolTip(tr("The name of this voice"));
@@ -68,6 +78,7 @@ MainWindow::MainWindow(const std::string &midiFile)
 		++track;
 		pb->setToolTip(tr("Play this voice"));
 		QObject::connect(pb, &QToolButton::clicked, this, &MainWindow::onPlayStop);
+		QObject::connect(this, &MainWindow::playbackStarted, pb, &PlayButton::onPlaybackStarted);
 		QObject::connect(this, &MainWindow::playbackStopped, pb, &PlayButton::onPlaybackStopped);
 
 		grid->addWidget(names[i], i + 1, 1);
@@ -131,9 +142,10 @@ void MainWindow::onPlayStop() {
 		emit playbackStopped();
 		fluidsynth.stop();
 	} else {
-		PlayButton *pb = dynamic_cast<PlayButton*>(QObject::sender());
-		pb->onPlaybackStarted();
-		midiFile = midiParser.withOnlyVoice(pb->getTrack());
+		QObject *clickedObject = QObject::sender();
+		PlayButton *clickedButton = dynamic_cast<PlayButton*>(clickedObject);
+		emit playbackStarted(clickedObject);
+		midiFile = midiParser.withOnlyVoice(clickedButton->getTrack());
 		fluidsynth.play(midiFile->fileName().toStdString());
 	}
 
