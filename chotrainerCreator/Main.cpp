@@ -1,12 +1,13 @@
 #include "MainWindow.h"
+
 #include <Exception.h>
 
 #include <QApplication>
-#include <QTranslator>
-#include <QLocale>
-
-#include <QFileDialog>
 #include <QDir>
+#include <QFileDialog>
+#include <QLocale>
+#include <QMessageBox>
+#include <QTranslator>
 
 int main(int argc, char *argv[]) {
 	Q_INIT_RESOURCE(core);
@@ -36,7 +37,7 @@ int main(int argc, char *argv[]) {
 		mainWindow.show();
 		return app.exec();
 	} catch (const Exception &e) {
-		//TODO show error
+		QMessageBox::critical(nullptr, QObject::tr("Critical Error"), QObject::tr("Can't process midi file:\n%1").arg(e.what()));
 	}
 
 	return EXIT_FAILURE;

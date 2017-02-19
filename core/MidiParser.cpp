@@ -1,5 +1,5 @@
-#include "MidiParser.h"
 #include "Exception.h"
+#include "MidiParser.h"
 
 #include <QCoreApplication>
 #include <QDir>
@@ -12,13 +12,13 @@
 
 std::vector<uint8_t> MidiParser::readFile(const std::string &filePath) {
 	std::ifstream file(filePath, std::ifstream::binary);
-	if (!file) throw(Exception("Can't open file"));
+	if (!file) throw(Exception(std::string("Can't open file ").append(filePath)));
 	file.seekg(0, file.end);
 	const size_t fileSize = file.tellg();
 	file.seekg(0, file.beg);
 	std::vector<uint8_t> data(fileSize);
 	file.read(reinterpret_cast<char*>(data.data()), fileSize);
-	if (!file) throw(Exception("Can't read file"));
+	if (!file) throw(Exception(std::string("Can't read file ").append(filePath)));
 	return data;
 }
 

@@ -1,6 +1,7 @@
 #include "MainWindow.h"
 
 #include <ChotrainerParser.h>
+#include <Exception.h>
 
 #include <QCloseEvent>
 #include <QCoreApplication>
@@ -9,6 +10,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QToolButton>
 #include <QVBoxLayout>
@@ -125,7 +127,11 @@ void MainWindow::onSave() {
 	f.seekg(0, f.beg);
 	f.read(reinterpret_cast<char*>(data.data()), data.size());
 
-	ChotrainerParser::createNewFile(namedTracks, data, filePath);
+	try {
+		ChotrainerParser::createNewFile(namedTracks, data, filePath);
+	} catch (const Exception &e) {
+		QMessageBox::warning(this, QObject::tr("Warning"), QObject::tr("Can't save to file:\n%1").arg(e.what()));
+	}
 }
 
 void MainWindow::onAccompaniment() {
@@ -146,7 +152,12 @@ void MainWindow::onPlayStop() {
 		QObject *clickedObject = QObject::sender();
 		PlayButton *clickedButton = dynamic_cast<PlayButton*>(clickedObject);
 		emit playbackStarted(clickedObject);
-		midiFile = midiParser.withOnlyVoice(clickedButton->getTrack());
+		try {
+			midiFile = midiParser.withOnlyVoice(clickedButton->getTrack());
+		} catch (const Exception &e) {
+			QMessageBox::critical(nullptr, QObject::tr("Critical Error"), QObject::tr("Can't create midi file:\n%1").arg(e.what()));
+			QCoreApplication::instance()->quit();
+		}
 		fluidsynth.play(midiFile->fileName().toStdString());
 	}
 

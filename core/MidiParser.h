@@ -104,8 +104,8 @@ class MidiParser {
 		/**
 		 * Throws if file can't be read.
 		 */
-		MidiParser(const std::string &filePath);
-		MidiParser(const std::vector<uint8_t> &midiData);
+		explicit MidiParser(const std::string &filePath);
+		explicit MidiParser(const std::vector<uint8_t> &midiData);
 
 		std::shared_ptr<QTemporaryFile> withOnlyVoice(size_t track, size_t fromBar = 0);
 		std::shared_ptr<QTemporaryFile> withForegroundVoice(size_t track, size_t fromBar = 0);

@@ -2,6 +2,7 @@
 #define SELECT_VOICE_DIALOG
 
 #include <QDialog>
+#include <ChotrainerParser.h>
 
 class SelectVoiceDialog : public QDialog {
 	Q_OBJECT
@@ -11,9 +12,9 @@ class SelectVoiceDialog : public QDialog {
 		size_t track;
 
 	public:
-		SelectVoiceDialog(const std::string &chotrainerFilePath);
+		explicit SelectVoiceDialog(const std::vector<ChotrainerParser::Track> &namedTracks);
 		size_t getTrack() const;
-		static size_t getVoice(const std::string &midiFilePath);
+		static size_t getVoice(const std::vector<ChotrainerParser::Track> &namedTracks);
 
 	public slots:
 		void onSetTrack();

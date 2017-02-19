@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow {
 		void closeEvent(QCloseEvent *event) override;
 
 	public:
-		MainWindow(const std::string &midiFile);
+		explicit MainWindow(const std::string &midiFile);
 
 	public slots:
 		void onSave();

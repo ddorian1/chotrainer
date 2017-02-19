@@ -20,7 +20,7 @@ class ChotrainerParser {
 		std::vector<uint8_t> midiFile;
 
 	public:
-		ChotrainerParser(const std::string &filePath);
+		explicit ChotrainerParser(const std::string &filePath);
 		std::vector<Track> getNamedTracks() const;
 		std::vector<uint8_t> getMidiFile() const;
 		static void createNewFile(const std::vector<Track> &namedTracks, const std::vector<uint8_t> &midiFile, const std::string &filePath);

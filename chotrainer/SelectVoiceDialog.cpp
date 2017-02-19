@@ -1,6 +1,5 @@
 #include "SelectVoiceDialog.h"
 
-#include <ChotrainerParser.h>
 #include <Exception.h>
 
 #include <QFrame>
@@ -17,30 +16,26 @@ class VoiceButton : public QPushButton {
 		size_t getTrack() const {return track;};
 };
 
-SelectVoiceDialog::SelectVoiceDialog(const std::string &chotrainerFilePath)
+SelectVoiceDialog::SelectVoiceDialog(const std::vector<ChotrainerParser::Track> &namedTracks)
 :
 	trackSet(false)
 {
 	QVBoxLayout *layout = new QVBoxLayout;
-
-	ChotrainerParser cp(chotrainerFilePath);
-	const std::vector<ChotrainerParser::Track> namedTracks = cp.getNamedTracks();
 	for (const auto &track : namedTracks) {
 		VoiceButton *b = new VoiceButton(QString::fromStdString(track.name), this, track.number);
 		QObject::connect(b, &QPushButton::clicked, this, &SelectVoiceDialog::onSetTrack);
 		layout->addWidget(b);
 	}
-
 	setLayout(layout);
 }
 
 size_t SelectVoiceDialog::getTrack() const {
-	if (!trackSet) throw(Exception("Track not set"));
+	if (!trackSet) throw(Exception("No track selected"));
 	return track;
 }
 
-size_t SelectVoiceDialog::getVoice(const std::string &midiFilePath) {
-	SelectVoiceDialog *d = new SelectVoiceDialog(midiFilePath);
+size_t SelectVoiceDialog::getVoice(const std::vector<ChotrainerParser::Track> &namedTracks) {
+	SelectVoiceDialog *d = new SelectVoiceDialog(namedTracks);
 	d->exec();
 	return d->getTrack();
 }

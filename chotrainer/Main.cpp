@@ -8,6 +8,7 @@
 #include <QTranslator>
 #include <QLocale>
 #include <QFileDialog>
+#include <QMessageBox>
 
 int main(int argc, char *argv[]) {
 	Q_INIT_RESOURCE(core);
@@ -32,17 +33,16 @@ int main(int argc, char *argv[]) {
 		filePath = arguments.at(1).toStdString();
 	}
 
-	size_t ownVoice;
 	try {
-		ownVoice = SelectVoiceDialog::getVoice(filePath);
+		ChotrainerParser cp(filePath);
+		const size_t ownVoice = SelectVoiceDialog::getVoice(cp.getNamedTracks());
+		MainWindow mainWindow(cp.getMidiFile(), ownVoice);
+		mainWindow.show();
+		return app.exec();
 	} catch (const Exception &e) {
-		//TODO show error
+		QMessageBox::critical(nullptr, QObject::tr("Critical Error"), QObject::tr("Can't process Chotrainer file:\n%1").arg(e.what()));
 		return EXIT_FAILURE;
 	}
 
-	ChotrainerParser cp(filePath);
-
-	MainWindow mainWindow(cp.getMidiFile(), ownVoice);
-	mainWindow.show();
-	return app.exec();
+	return EXIT_FAILURE;
 }

@@ -1,5 +1,7 @@
 #include "MainWindow.h"
 
+#include <Exception.h>
+#include <QMessageBox>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QFrame>
@@ -87,7 +89,12 @@ void MainWindow::onPlayStop() {
 		bPlayStop->setText(tr("Play"));
 		bPlayStop->setIcon(QIcon::fromTheme("media-playback-start", QIcon(":/icons/media-playback-start")));
 	} else {
-		updateMidiFile();
+		try {
+			updateMidiFile();
+		} catch (const Exception &e) {
+			QMessageBox::critical(nullptr, QObject::tr("Critical Error"), QObject::tr("Can't create midi file:\n%1").arg(e.what()));
+			QCoreApplication::instance()->quit();
+		}
 		fluidsynth.play(midiFile->fileName().toStdString());
 		bPlayStop->setText(tr("Stop"));
 		bPlayStop->setIcon(QIcon::fromTheme("media-playback-stop", QIcon(":/icons/media-plaback-stop")));
