@@ -26,7 +26,7 @@ int main(int argc, char *argv[]) {
 	QStringList arguments = app.arguments();
 	std::string filePath;
 	if (arguments.length() < 2) {
-		filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.midi)").arg(QObject::tr("Midi file"))).toStdString();
+		filePath = QFileDialog::getOpenFileName(nullptr, QObject::tr("Open File"), QDir::homePath(), QString("%1 (*.midi *.mid)").arg(QObject::tr("Midi file"))).toStdString();
 		if (filePath == "") return EXIT_FAILURE;
 	} else {
 		filePath = arguments.at(1).toStdString();

@@ -8,10 +8,10 @@
 #include <QLabel>
 #include <QVBoxLayout>
 
-MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
+MainWindow::MainWindow(const ChotrainerParser &cp, const ChotrainerParser::Track &ownTrack)
 :
-	ownTrack(ownTrack),
-	midiParser(midiData),
+	ownTrack(ownTrack.number),
+	midiParser(cp.getMidiFile()),
 	playing(false),
 	bOwnVoiceOnly(new QToolButton(this)),
 	bOwnVoiceForeground(new QToolButton(this)),
@@ -22,6 +22,13 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 {
 	QWidget *centralWidget = new QWidget(this);
 	QVBoxLayout *layout = new QVBoxLayout(centralWidget);
+
+	QLabel *pieceName = new QLabel(QString::fromStdString(cp.getPieceName()), this);
+	QLabel *voiceName = new QLabel(QString::fromStdString(ownTrack.name), this);
+	pieceName->setAlignment(Qt::AlignCenter);
+	voiceName->setAlignment(Qt::AlignCenter);
+	pieceName->setStyleSheet(QString("font-size: %1pt;").arg(QFont().pointSize()*1.5));
+	voiceName->setStyleSheet("font-style: italic;");
 	
 	QFrame *sep = new QFrame(this);
 	sep->setFrameShape(QFrame::HLine);
@@ -34,6 +41,8 @@ MainWindow::MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack)
 	sBar->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 	barLabel->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
 
+	layout->addWidget(pieceName);
+	layout->addWidget(voiceName);
 	layout->addWidget(bOwnVoiceOnly);
 	layout->addWidget(bOwnVoiceForeground);
 	layout->addWidget(bNoForeground);

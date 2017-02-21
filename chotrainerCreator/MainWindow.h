@@ -4,17 +4,18 @@
 #include <Fluidsynth.h>
 #include <MidiParser.h>
 
-#include <QCheckBox>
 #include <QMainWindow>
-#include <QLineEdit>
 #include <string>
 
+class QCheckBox;
+class QLineEdit;
 class TrackName;
 
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 
 	private:
+		QLineEdit *pieceName;
 		bool playing;
 		const std::string midiFilePath;
 		MidiParser midiParser;

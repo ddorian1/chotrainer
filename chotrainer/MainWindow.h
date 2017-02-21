@@ -4,6 +4,7 @@
 #include <Fluidsynth.h>
 #include <MidiParser.h>
 
+#include <ChotrainerParser.h>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QSpinBox>
@@ -35,7 +36,7 @@ class MainWindow : public QMainWindow {
 		void closeEvent(QCloseEvent *event) override;
 
 	public:
-		MainWindow(const std::vector<uint8_t> &midiData, size_t ownTrack);
+		MainWindow(const ChotrainerParser &cp, const ChotrainerParser::Track &ownTrack);
 
 	public slots:
 		void onPlayStop();

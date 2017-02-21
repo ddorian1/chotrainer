@@ -35,8 +35,8 @@ int main(int argc, char *argv[]) {
 
 	try {
 		ChotrainerParser cp(filePath);
-		const size_t ownVoice = SelectVoiceDialog::getVoice(cp.getNamedTracks());
-		MainWindow mainWindow(cp.getMidiFile(), ownVoice);
+		const ChotrainerParser::Track ownTrack = SelectVoiceDialog::getVoice(cp.getNamedTracks());
+		MainWindow mainWindow(cp, ownTrack);
 		mainWindow.show();
 		return app.exec();
 	} catch (const Exception &e) {

@@ -28,8 +28,8 @@ ChotrainerParser::ChotrainerParser(const std::string &filePath) {
 	std::ifstream f(filePath, std::ifstream::binary);
 	if (!f) throw(Exception("Can't open file"));
 
-	std::vector<uint8_t> begin(9);
-	f.read(reinterpret_cast<char*>(begin.data()), 9);
+	std::vector<uint8_t> begin(5);
+	f.read(reinterpret_cast<char*>(begin.data()), 5);
 	if (!f) throw(Exception("Can't read file"));
 
 	const std::vector<uint8_t> magicChars = {'C', 'h', 'o', 'T'};
@@ -38,20 +38,31 @@ ChotrainerParser::ChotrainerParser(const std::string &filePath) {
 	if (begin[4] != 1)
 		throw(Exception("No support for file version"));
 
-	const uint32_t numberOfNamedTracks = btoh32(begin.data() + 5);
+	std::vector<uint8_t> tmp(4);
+	f.read(reinterpret_cast<char*>(tmp.data()), 4);
+	if (!f) throw(Exception("Can't read file"));
 
+	const uint32_t pieceNameLength = btoh32(tmp.data());
+	pieceName.resize(pieceNameLength);
+	f.read(&pieceName[0], pieceNameLength);
+	if (!f) throw(Exception("Can't read file"));
+
+	f.read(reinterpret_cast<char*>(tmp.data()), 4);
+	if (!f) throw(Exception("Can't read file"));
+
+	const uint32_t numberOfNamedTracks = btoh32(tmp.data());
 	for (size_t i = 0; i < numberOfNamedTracks; ++i) {
-		std::vector<uint8_t> data1(8);
-		f.read(reinterpret_cast<char*>(data1.data()), 8);
+		std::vector<uint8_t> header(8);
+		f.read(reinterpret_cast<char*>(header.data()), 8);
 		if (!f) throw(Exception("Can't read file"));
 
-		const uint32_t trackNameLength = btoh32(data1.data() + 4);
-		std::vector<char> data2(trackNameLength + 1);
-		f.read(data2.data(), trackNameLength);
+		const uint32_t trackNameLength = btoh32(header.data() + 4);
+		std::string trackName;
+		trackName.resize(trackNameLength);
+		f.read(&trackName[0], trackNameLength);
 		if (!f) throw(Exception("Can't read file"));
-		data2[trackNameLength] = '\0';
 
-		namedTracks.emplace_back(btoh32(data1.data()), data2.data());
+		namedTracks.emplace_back(btoh32(header.data()), trackName);
 	}
 
 	std::vector<uint8_t> data(4);
@@ -64,12 +75,19 @@ ChotrainerParser::ChotrainerParser(const std::string &filePath) {
 	if (!f) throw(Exception("Can't read file"));
 }	
 
-void ChotrainerParser::createNewFile(const std::vector<Track> &namedTracks, const std::vector<uint8_t> &midiFile, const std::string &filePath) {
+void ChotrainerParser::createNewFile(const std::vector<Track> &namedTracks, const std::string &pieceName, const std::vector<uint8_t> &midiFile, const std::string &filePath) {
 	std::ofstream f(filePath, std::ofstream::binary);
 	if (!f) throw(Exception("Can't open file"));
 
 	const std::vector<uint8_t> begin = {'C', 'h', 'o', 'T', 1};
 	f.write(reinterpret_cast<const char*>(begin.data()), begin.size());
+	if (!f) throw(Exception("Can't write to file"));
+
+	const auto lengthOfPieceNameB = htob32(pieceName.size());
+	f.write(reinterpret_cast<const char*>(lengthOfPieceNameB.data()), 4);
+	if (!f) throw(Exception("Can't write to file"));
+
+	f.write(pieceName.c_str(), pieceName.size());
 	if (!f) throw(Exception("Can't write to file"));
 
 	const auto numberOfNamedTracksB = htob32(namedTracks.size());
@@ -94,6 +112,10 @@ void ChotrainerParser::createNewFile(const std::vector<Track> &namedTracks, cons
 	if (!f) throw(Exception("Can't write to file"));
 
 	f.write(reinterpret_cast<const char*>(midiFile.data()), midiFile.size());
+}
+
+std::string ChotrainerParser::getPieceName() const {
+	return pieceName;
 }
 
 std::vector<ChotrainerParser::Track> ChotrainerParser::getNamedTracks() const {

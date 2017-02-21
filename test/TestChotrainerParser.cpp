@@ -18,7 +18,7 @@ void TestMain::chotrainerParser() {
 	const ChotrainerParser::Track t1 = {1, "Sopran"};
 	const ChotrainerParser::Track t2 = {2, "Alt"};
 	const std::vector<ChotrainerParser::Track> namedTracks = {t1, t2};
-	ChotrainerParser::createNewFile(namedTracks, midiFile, tmp.fileName().toStdString());
+	ChotrainerParser::createNewFile(namedTracks, "Test Piece", midiFile, tmp.fileName().toStdString());
 
 	ChotrainerParser cp(tmp.fileName().toStdString());
 

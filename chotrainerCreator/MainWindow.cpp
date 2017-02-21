@@ -3,6 +3,7 @@
 #include <ChotrainerParser.h>
 #include <Exception.h>
 
+#include <QCheckBox>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QDir>
@@ -10,6 +11,7 @@
 #include <QFrame>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
 #include <QToolButton>
@@ -49,12 +51,20 @@ class TrackName : public QLineEdit {
 
 MainWindow::MainWindow(const std::string &midiFile)
 :
+	pieceName(new QLineEdit(this)),
 	playing(false),
 	midiFilePath(midiFile),
 	midiParser(midiFile)
 {
 	QWidget *centralWidget = new QWidget(this);
 	QVBoxLayout *layout = new QVBoxLayout(centralWidget);
+
+	layout->addWidget(new QLabel(tr("Name of piece"), this));
+	layout->addWidget(pieceName);
+
+	QFrame *sep1 = new QFrame(this);
+	sep1->setFrameShape(QFrame::HLine);
+	layout->addWidget(sep1);
 
 	const std::list<size_t> musicTracks = midiParser.getMusicTracks();
 
@@ -72,7 +82,7 @@ MainWindow::MainWindow(const std::string &midiFile)
 	}
 
 	QGridLayout *grid = new QGridLayout();
-	grid->addWidget(new QLabel(tr("Name"), this), 0, 1);
+	grid->addWidget(new QLabel(tr("Name of voice"), this), 0, 1);
 	grid->addWidget(new QLabel(tr("Accompaniment"), this), 0, 2);
 	auto track = musicTracks.begin();
 	for (size_t i = 0; i < musicTracks.size(); ++i) {
@@ -89,9 +99,9 @@ MainWindow::MainWindow(const std::string &midiFile)
 	}
 	layout->addLayout(grid);
 	
-	QFrame *sep = new QFrame(this);
-	sep->setFrameShape(QFrame::HLine);
-	layout->addWidget(sep);
+	QFrame *sep2 = new QFrame(this);
+	sep2->setFrameShape(QFrame::HLine);
+	layout->addWidget(sep2);
 
 	QHBoxLayout *l = new QHBoxLayout();
 	QPushButton *bClose = new QPushButton(tr("Close"));
@@ -111,7 +121,7 @@ MainWindow::MainWindow(const std::string &midiFile)
 }
 
 void MainWindow::onSave() {
-	const std::string filePath = QFileDialog::getSaveFileName(nullptr, QObject::tr("Save File"), QDir::homePath(), QString("%1 (*.chotrainer)").arg(QObject::tr("Chotrainer file"))).toStdString();
+	const std::string filePath = QFileDialog::getSaveFileName(this, QObject::tr("Save File"), QString("%1/%2").arg(QDir::homePath(), pieceName->text()), QString("%1 (*.chotrainer)").arg(QObject::tr("Chotrainer file"))).toStdString();
 	if (filePath == "") return;
 
 	std::vector<ChotrainerParser::Track> namedTracks;
@@ -128,7 +138,7 @@ void MainWindow::onSave() {
 	f.read(reinterpret_cast<char*>(data.data()), data.size());
 
 	try {
-		ChotrainerParser::createNewFile(namedTracks, data, filePath);
+		ChotrainerParser::createNewFile(namedTracks, pieceName->text().toStdString(), data, filePath);
 	} catch (const Exception &e) {
 		QMessageBox::warning(this, QObject::tr("Warning"), QObject::tr("Can't save to file:\n%1").arg(e.what()));
 	}

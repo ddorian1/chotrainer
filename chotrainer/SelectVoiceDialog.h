@@ -9,12 +9,12 @@ class SelectVoiceDialog : public QDialog {
 
 	private:
 		bool trackSet;
-		size_t track;
+		ChotrainerParser::Track track;
 
 	public:
 		explicit SelectVoiceDialog(const std::vector<ChotrainerParser::Track> &namedTracks);
-		size_t getTrack() const;
-		static size_t getVoice(const std::vector<ChotrainerParser::Track> &namedTracks);
+		ChotrainerParser::Track getTrack() const;
+		static ChotrainerParser::Track getVoice(const std::vector<ChotrainerParser::Track> &namedTracks);
 
 	public slots:
 		void onSetTrack();
