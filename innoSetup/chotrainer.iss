@@ -13,7 +13,7 @@ Name: "de"; MessagesFile: "compiler:Languages\German.isl"
 
 [Components]
 Name: "Chotrainer"; Description: "Chotrainer"; Types: full compact custom; Flags: fixed
-Name: "Creator"; Description: "Chotrainer Creator"; Types: custom
+Name: "Creator"; Description: "Chotrainer Creator"; Types: full
 
 [Files]
 Source: "files\Qt5Core.dll"; DestDir: "{app}"
