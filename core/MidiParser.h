@@ -88,7 +88,11 @@ class MidiParser {
 		 */
 		size_t getBytesTillEnd(const uint8_t *p) const;
 
-		size_t getBytesTillTrackEnd(const uint8_t *p); //TODO const
+		/**
+		 * Get bytes till end of track, including byte pointed to.
+		 * Throws if pointer doesn't point into data.
+		 */
+		size_t getBytesTillTrackEnd(const uint8_t *p);
 
 		void setNoForegroundVoice();
 		void setForegroundVoice(size_t track);
@@ -107,6 +111,7 @@ class MidiParser {
 		explicit MidiParser(const std::string &filePath);
 		explicit MidiParser(const std::vector<uint8_t> &midiData);
 
+		std::vector<uint8_t> getData() const;
 		std::shared_ptr<QTemporaryFile> withOnlyVoice(size_t track, size_t fromBar = 0);
 		std::shared_ptr<QTemporaryFile> withForegroundVoice(size_t track, size_t fromBar = 0);
 		std::shared_ptr<QTemporaryFile> withoutForegroundVoice(size_t fromBar = 0);

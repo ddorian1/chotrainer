@@ -130,15 +130,8 @@ void MainWindow::onSave() {
 		namedTracks.emplace_back(names.at(i)->getTrack(), names.at(i)->text().toStdString());
 	}
 
-	//TODO get from midiParser
-	std::ifstream f(midiFilePath, std::ifstream::binary);
-	f.seekg(0, f.end);
-	std::vector<uint8_t> data(f.tellg());
-	f.seekg(0, f.beg);
-	f.read(reinterpret_cast<char*>(data.data()), data.size());
-
 	try {
-		ChotrainerParser::createNewFile(namedTracks, pieceName->text().toStdString(), data, filePath);
+		ChotrainerParser::createNewFile(namedTracks, pieceName->text().toStdString(), midiParser.getData(), filePath);
 	} catch (const Exception &e) {
 		QMessageBox::warning(this, QObject::tr("Warning"), QObject::tr("Can't save to file:\n%1").arg(e.what()));
 	}

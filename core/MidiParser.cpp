@@ -60,7 +60,7 @@ std::list<MidiParser::Event> MidiParser::getEvents(size_t track, uint8_t event, 
 	const uint8_t *nextTrack = getTrackPos(track + 1);
 	const uint8_t *trackEnd = p + 8 + trackLen;
 	if (nextTrack && nextTrack != trackEnd) throw(Exception("File inconsistent"));
-	//TODO check if trackEnd is for EOF
+	getBytesTillEnd(trackEnd); //Called to make shure that trackEnd is in data
 
 	p += 8; //Skip "MTrk" and length
 	unsigned long long tick = 0;
@@ -215,7 +215,7 @@ void MidiParser::setInstrumentName(size_t track, const std::string &instrumentNa
 	uint8_t *nextTrackPos = getTrackPos(track + 1);
 	if (!nextTrackPos) nextTrackPos = data.data() + data.size();
 	if (nextTrackPos - trackPos < 8) throw(Exception("Invalid file"));
-	const unsigned long newTrackSize = static_cast<unsigned long>(nextTrackPos - trackPos - 8);	//TODO test for overflow
+	const unsigned long newTrackSize = static_cast<unsigned long>(nextTrackPos - trackPos - 8);
 	*(trackPos + 4) = (newTrackSize & 0xFF000000lu) >> 24;
 	*(trackPos + 5) = (newTrackSize & 0x00FF0000lu) >> 16;
 	*(trackPos + 6) = (newTrackSize & 0x0000FF00lu) >> 8;
@@ -409,7 +409,8 @@ void MidiParser::writeTrack(std::shared_ptr<std::ofstream> f, size_t track, size
 		data = tmp.data();
 		length = tmp.size();
 
-		unsigned long trackLength = length - 8; //TODO test for overflow
+		unsigned long trackLength = length - 8;
+		if (trackLength > length) throw(Exception("Integer overflow (trackLength)"));
 		*(data + 4) = (trackLength & 0xFF000000lu) >> 24;
 		*(data + 5) = (trackLength & 0x00FF0000lu) >> 16;
 		*(data + 6) = (trackLength & 0x0000FF00lu) >> 8;
@@ -438,4 +439,8 @@ std::list<size_t> MidiParser::getMusicTracks() {
 		if (!getEvents(i, 0xC0u, 0xF0u).empty()) l.push_back(i);
 	}
 	return l;
+}
+
+std::vector<uint8_t> MidiParser::getData() const {
+	return data;
 }
