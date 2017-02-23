@@ -24,12 +24,13 @@ std::vector<uint8_t> MidiParser::readFile(const std::string &filePath) {
 
 MidiParser::MidiParser(const std::string &filePath)
 :
-	MidiParser(readFile(filePath))
+	MidiParser(readFile(filePath), std::vector<ChotrainerParser::Track>())
 {}
 
-MidiParser::MidiParser(const std::vector<uint8_t> &midiData)
+MidiParser::MidiParser(const std::vector<uint8_t> &midiData, const std::vector<ChotrainerParser::Track> &namedTracks)
 :
-	data(midiData)
+	data(midiData),
+	namedTracks(namedTracks)
 {
 	if (data.size() < 14) throw(Exception("Data to short"));
 	if (data[8] != 0x00u || data[9] != 0x01u) throw(Exception("Only format 1 files are supported"));
@@ -59,8 +60,11 @@ std::list<MidiParser::Event> MidiParser::getEvents(size_t track, uint8_t event, 
 	trackLen |= *(p + 7);
 	const uint8_t *nextTrack = getTrackPos(track + 1);
 	const uint8_t *trackEnd = p + 8 + trackLen;
-	if (nextTrack && nextTrack != trackEnd) throw(Exception("File inconsistent"));
-	getBytesTillEnd(trackEnd); //Called to make shure that trackEnd is in data
+	if (nextTrack) {
+		if (nextTrack != trackEnd) throw(Exception("File inconsistent"));
+	} else {
+		if (getBytesTillEnd(trackEnd - 1) != 1)  throw(Exception("File inconsistent"));
+	}
 
 	p += 8; //Skip "MTrk" and length
 	unsigned long long tick = 0;
@@ -274,16 +278,24 @@ size_t MidiParser::getBytesTillTrackEnd(const uint8_t *p) {
 }
 
 void MidiParser::setNoForegroundVoice() {
+	std::vector<ChotrainerParser::Track> namTmp = namedTracks;
+	std::sort(namTmp.begin(), namTmp.end(), [](ChotrainerParser::Track i, ChotrainerParser::Track j){return i.number > j.number;});
 	for (size_t i = 0; getTrackPos(i) != nullptr; ++i) {
 		try {
-			setInstrument(i, 0x00u, "acoustic grand");
-		} catch (Exception &e) {}
+			if (i == namTmp.back().number) {
+				setInstrument(i, 0x35u, "voice oohs");
+				namTmp.pop_back();
+			} else {
+				setInstrument(i, 0x00u, "acoustic grand");
+			}
+		} catch (const Exception &e) {}
 	}
 }
 
 void MidiParser::setForegroundVoice(size_t track) {
 	setNoForegroundVoice();
-	setInstrument(track, 0x35u, "voice oohs");
+	setInstrument(track, 0x38u, "trumpet");
+	//setInstrument(track, 0x34u, "choir aahs");
 }
 
 std::shared_ptr<QTemporaryFile> MidiParser::withOnlyVoice(size_t track, size_t fromBar) {
@@ -304,7 +316,7 @@ std::shared_ptr<QTemporaryFile> MidiParser::withOnlyVoice(size_t track, size_t f
 	if (!*f) throw(Exception("Can't write to file"));
 
 	std::vector<size_t> tracks = {0, track};
-	setNoForegroundVoice();
+	setInstrument(track, 0x00u, "acoustic grand");
 	for (const auto &tr : tracks) writeTrack(f, tr, fromBar);
 
 	return tmpFile;

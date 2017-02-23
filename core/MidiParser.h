@@ -1,6 +1,8 @@
 #ifndef MIDI_PARSER_H
 #define MIDI_PARSER_H
 
+#include "ChotrainerParser.h"
+
 #include <fstream>
 #include <list>
 #include <memory>
@@ -24,6 +26,7 @@ class MidiParser {
 		};
 
 		std::vector<uint8_t> data;
+		const std::vector<ChotrainerParser::Track> namedTracks;
 
 		/**
 		 * Set Instrument of track, counting tracks from 0.
@@ -109,7 +112,7 @@ class MidiParser {
 		 * Throws if file can't be read.
 		 */
 		explicit MidiParser(const std::string &filePath);
-		explicit MidiParser(const std::vector<uint8_t> &midiData);
+		explicit MidiParser(const std::vector<uint8_t> &midiData, const std::vector<ChotrainerParser::Track> &namedTracks);
 
 		std::vector<uint8_t> getData() const;
 		std::shared_ptr<QTemporaryFile> withOnlyVoice(size_t track, size_t fromBar = 0);

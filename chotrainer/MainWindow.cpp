@@ -11,7 +11,7 @@
 MainWindow::MainWindow(const ChotrainerParser &cp, const ChotrainerParser::Track &ownTrack)
 :
 	ownTrack(ownTrack.number),
-	midiParser(cp.getMidiFile()),
+	midiParser(cp.getMidiFile(), cp.getNamedTracks()),
 	playing(false),
 	bOwnVoiceOnly(new QToolButton(this)),
 	bOwnVoiceForeground(new QToolButton(this)),
