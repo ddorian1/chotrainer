@@ -11,9 +11,13 @@ ChangesAssociations=yes
 Name: "en"; MessagesFile: "compiler:Default.isl"
 Name: "de"; MessagesFile: "compiler:Languages\German.isl"
 
+[Types]
+Name: "normal"; Description: "Chotrainer"
+Name: "extended"; Description: "Chotrainer/Creator"
+
 [Components]
-Name: "Chotrainer"; Description: "Chotrainer"; Types: full compact custom; Flags: fixed
-Name: "Creator"; Description: "Chotrainer Creator"; Types: full
+Name: "Chotrainer"; Description: "Chotrainer"; Types: normal extended
+Name: "Creator"; Description: "Chotrainer Creator"; Types: extended
 
 [Files]
 Source: "files\Qt5Core.dll"; DestDir: "{app}"
