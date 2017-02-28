@@ -43,7 +43,11 @@ ChotrainerParser::ChotrainerParser(const std::string &filePath) {
 	if (!f) throw(Exception("Can't read file"));
 
 	const uint32_t pieceNameLength = btoh32(tmp.data());
-	pieceName.resize(pieceNameLength);
+	try {
+		pieceName.resize(pieceNameLength);
+	} catch (const std::bad_alloc &e) {
+		throw(Exception("Can't allocate enough memory (pieceName)"));
+	}
 	f.read(&pieceName[0], pieceNameLength);
 	if (!f) throw(Exception("Can't read file"));
 
@@ -58,7 +62,11 @@ ChotrainerParser::ChotrainerParser(const std::string &filePath) {
 
 		const uint32_t trackNameLength = btoh32(header.data() + 4);
 		std::string trackName;
-		trackName.resize(trackNameLength);
+		try {
+			trackName.resize(trackNameLength);
+		} catch (const std::bad_alloc &e) {
+			throw(Exception("Can't allocate enough memory (trackName)"));
+		}
 		f.read(&trackName[0], trackNameLength);
 		if (!f) throw(Exception("Can't read file"));
 
