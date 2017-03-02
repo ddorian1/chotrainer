@@ -4,6 +4,7 @@
 #include <QFrame>
 #include <QLabel>
 #include <QPushButton>
+#include <QTimer>
 #include <QVBoxLayout>
 
 class VoiceButton : public QPushButton {
@@ -30,6 +31,7 @@ SelectVoiceDialog::SelectVoiceDialog(const std::vector<ChotrainerParser::Track> 
 		layout->addWidget(b);
 	}
 	setLayout(layout);
+	QTimer::singleShot(0, this, [=](){setFixedSize(size());});
 }
 
 ChotrainerParser::Track SelectVoiceDialog::getTrack() const {

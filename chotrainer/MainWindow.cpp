@@ -1,11 +1,12 @@
 #include "MainWindow.h"
 
 #include <Exception.h>
-#include <QMessageBox>
 #include <QCloseEvent>
 #include <QCoreApplication>
 #include <QFrame>
 #include <QLabel>
+#include <QMessageBox>
+#include <QTimer>
 #include <QVBoxLayout>
 
 MainWindow::MainWindow(const ChotrainerParser &cp, const ChotrainerParser::Track &ownTrack)
@@ -83,6 +84,7 @@ MainWindow::MainWindow(const ChotrainerParser &cp, const ChotrainerParser::Track
 	sBar->setValue(1);
 
 	onOwnVoiceForeground();
+	QTimer::singleShot(0, this, [=](){setFixedSize(size());});
 }
 
 void MainWindow::setChecked(const QToolButton *button) {

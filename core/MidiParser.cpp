@@ -63,7 +63,7 @@ std::list<MidiParser::Event> MidiParser::getEvents(size_t track, uint8_t event, 
 	if (nextTrack) {
 		if (nextTrack != trackEnd) throw(Exception("File inconsistent"));
 	} else {
-		if (getBytesTillEnd(trackEnd - 1) != 1)  throw(Exception("File inconsistent"));
+		if (getBytesTillEnd(trackEnd - 1) < 1) throw(Exception("File inconsistent")); //Should be exactly 1, but some files seem to have garbage at the end
 	}
 
 	p += 8; //Skip "MTrk" and length
@@ -186,7 +186,7 @@ void MidiParser::setInstrumentId(size_t track, uint8_t instrumentId) {
 
 void MidiParser::setInstrumentName(size_t track, const std::string &instrumentName) {
 	uint8_t *instPos = getInstrumentPos(track);
-	if (!instPos) throw(Exception("No such track"));
+	if (!instPos) return; //No name found, so there is nothing to change
 
 	size_t oldInstNameSize, oldVLengthBytes;
 	std::tie(oldInstNameSize, oldVLengthBytes) = sizeTFromVLength(instPos + 2);

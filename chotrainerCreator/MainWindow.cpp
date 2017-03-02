@@ -14,6 +14,7 @@
 #include <QLineEdit>
 #include <QMessageBox>
 #include <QPushButton>
+#include <QTimer>
 #include <QToolButton>
 #include <QVBoxLayout>
 
@@ -118,6 +119,8 @@ MainWindow::MainWindow(const std::string &midiFile)
 	QObject::connect(bClose, &QPushButton::clicked, this, &QMainWindow::close);
 	QObject::connect(bSave, &QPushButton::clicked, this, &MainWindow::onSave);
 	QObject::connect(&fluidsynth, &Fluidsynth::playbackStopped, this, &MainWindow::onPlayStop);
+
+	QTimer::singleShot(0, this, [=](){setFixedSize(size());});
 }
 
 void MainWindow::onSave() {
