@@ -182,6 +182,7 @@ void MidiParser::setInstrumentId(size_t track, uint8_t instrumentId) {
 	std::list<Event> programChangeEvents = getEvents(track, 0xC0u, 0xF0u);
 	for (const auto &event : programChangeEvents)
 		*(event.ptr + 1) = instrumentId;
+	//TODO also set velocity of notes
 }
 
 void MidiParser::setInstrumentName(size_t track, const std::string &instrumentName) {
@@ -282,7 +283,7 @@ void MidiParser::setNoForegroundVoice() {
 	std::sort(namTmp.begin(), namTmp.end(), [](ChotrainerParser::Track i, ChotrainerParser::Track j){return i.number > j.number;});
 	for (size_t i = 0; getTrackPos(i) != nullptr; ++i) {
 		try {
-			if (i == namTmp.back().number) {
+			if (!namTmp.empty() && i == namTmp.back().number) {
 				setInstrument(i, 0x35u, "voice oohs");
 				namTmp.pop_back();
 			} else {
