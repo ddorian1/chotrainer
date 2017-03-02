@@ -1,10 +1,17 @@
 QT += testlib
 TEMPLATE = app
+CONFIG += testcase
 TARGET = test
 INCLUDEPATH += ../core
-LIBPATH += ../core ../core/release
-LIBS += -lcore
-CONFIG += testcase
+
+win32 {
+	LIBPATH += ../core/release
+	LIBS += -lcore0
+}
+unix {
+	LIBPATH += ../core
+	LIBS += -lcore
+}
 
 include(../common.pri)
 
