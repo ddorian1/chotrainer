@@ -1,3 +1,5 @@
+VERSION = 0.1.0
+
 QT += core
 #CONFIG += debug
 QMAKE_CXXFLAGS_DEBUG += -g -Wall -Wextra -Werror
