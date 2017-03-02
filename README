@@ -1,0 +1,9 @@
+File Format
+
+All numbers in the header are 4 bytes MSB first.
+Strings are not \0 terminated.
+
+"ChoT" + 1
+<number of named tracks>
+<number of track> + <length of name string> + <name> (for each named track)
+<length of midi file> + <midi file>
