@@ -20,3 +20,6 @@ HEADERS +=	MainWindow.h \
 SOURCES +=	Main.cpp \
 			MainWindow.cpp \
 			SelectVoiceDialog.cpp
+
+target.path = /usr/bin
+INSTALLS += target

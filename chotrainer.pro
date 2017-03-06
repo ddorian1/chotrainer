@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
-CONFIG += c++11 ordered
+CONFIG += ordered
 
 SUBDIRS =	core \
 			chotrainer \

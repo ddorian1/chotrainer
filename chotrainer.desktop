@@ -1,0 +1,11 @@
+[Desktop Entry]
+Terminal=false
+Name=Chotrainer
+GenericName=Chotrainer
+Comment=Training software for choirs
+Comment[de]=Übungssoftware für Chöre
+Exec=chotrainer %f
+Icon=chotrainer
+Type=Application
+Categories=Education;Music;
+MimeType=application/chotrainer;

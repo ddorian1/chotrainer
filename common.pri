@@ -2,6 +2,7 @@ VERSION = 0.1.0
 
 QT += core
 #CONFIG += debug
+CONFIG += c++11
 QMAKE_CXXFLAGS_DEBUG += -g -Wall -Wextra -Werror
 LIBS += -lfluidsynth
 MOC_DIR = moc

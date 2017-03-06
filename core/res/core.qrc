@@ -1,6 +1,6 @@
 <!DOCTYPE RCC><RCC version="1.0">
  <qresource>
-  <file alias="icon">icon.svg</file>
+  <file alias="icon">chotrainer.svg</file>
   <file>TimGM6mb.sf2</file>
   <file alias="icons/application-exit">icons/application-exit.svg</file>
   <file alias="icons/document-save">icons/document-save.svg</file>
