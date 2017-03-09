@@ -28,10 +28,11 @@ appicon.path = /usr/share/pixmaps
 appicon.files = res/chotrainer.svg
 INSTALLS += appicon
 
-mimeicontarget.target = res/application-chotrainer.svg
-mimeicontarget.commands = cp res/chotrainer.svg res/application-chotrainer.svg
-QMAKE_EXTRA_TARGETS += mimeicontarget
-POST_TARGETDEPS += res/application-chotrainer.svg
+## Seems to be broken with qt <= 5.6
+#mimeicontarget.target = res/application-chotrainer.svg
+#mimeicontarget.commands = cp res/chotrainer.svg res/application-chotrainer.svg
+#QMAKE_EXTRA_TARGETS += mimeicontarget
+#POST_TARGETDEPS += res/application-chotrainer.svg
 
 mimeicon.path = /usr/share/icons/hicolor/scalable/mimetypes
 mimeicon.files = res/application-chotrainer.svg

@@ -7,7 +7,6 @@ chotrainerCreator/chotrainerCreator
 chotrainerCreator/release/
 core/libcore.so*
 core/release/
-core/res/application-chotrainer.svg
 intl/*.qm
 moc/
 obj/
