@@ -1,10 +1,10 @@
 [Setup]
 AppName=Chotrainer
-AppVersion=0.1.0
+AppVersion=0.1.1
 DefaultDirName={pf}\Chotrainer
 DefaultGroupName=Chotrainer
 SetupIconFile=..\windowsicon\icon.ico
-OutputBaseFilename=ChotrainerSetup-0.1.0
+OutputBaseFilename=ChotrainerSetup-0.1.1
 ChangesAssociations=yes
 
 [Languages]
