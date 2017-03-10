@@ -1,16 +1,16 @@
 QT += testlib
 TEMPLATE = app
-CONFIG += testcase
+#CONFIG += testcase
 TARGET = test
-INCLUDEPATH += ../core
+INCLUDEPATH += ../libchotrainer
 
 win32 {
-	LIBPATH += ../core/release
-	LIBS += -lcore0
+	LIBPATH += ../libchotrainer/release
+	LIBS += -lchotrainer0
 }
 unix {
-	LIBPATH += ../core
-	LIBS += -lcore
+	LIBPATH += ../libchotrainer
+	LIBS += -lchotrainer
 }
 
 include(../common.pri)

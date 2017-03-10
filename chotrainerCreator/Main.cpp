@@ -10,7 +10,7 @@
 #include <QTranslator>
 
 int main(int argc, char *argv[]) {
-	Q_INIT_RESOURCE(core);
+	Q_INIT_RESOURCE(chotrainer);
 	Q_INIT_RESOURCE(intl);
 
 	QApplication app(argc, argv);

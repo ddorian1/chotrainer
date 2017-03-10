@@ -1,15 +1,15 @@
 QT += widgets
 TEMPLATE = app
 TARGET = chotrainer
-INCLUDEPATH += ../core
+INCLUDEPATH += ../libchotrainer
 
 win32 {
-	LIBPATH += ../core/release
-	LIBS += -lcore0
+	LIBPATH += ../libchotrainer/release
+	LIBS += -lchotrainer0
 }
 unix {
-	LIBPATH += ../core
-	LIBS += -lcore
+	LIBPATH += ../libchotrainer
+	LIBS += -lchotrainer
 }
 
 include(../common.pri)
@@ -20,3 +20,6 @@ HEADERS +=	MainWindow.h \
 SOURCES +=	Main.cpp \
 			MainWindow.cpp \
 			SelectVoiceDialog.cpp
+
+target.path = /usr/bin
+INSTALLS += target

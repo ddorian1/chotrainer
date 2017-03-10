@@ -12,7 +12,7 @@ Fluidsynth::Fluidsynth()
 	adriver(new_fluid_audio_driver(settings, synth)),
 	timer(nullptr)
 {
-	Q_INIT_RESOURCE(core);
+	Q_INIT_RESOURCE(chotrainer);
 	QFile f(":/TimGM6mb.sf2");
 	QTemporaryFile *tmpSf = QTemporaryFile::createNativeFile(f);
 	const std::string path = tmpSf->fileName().toStdString();

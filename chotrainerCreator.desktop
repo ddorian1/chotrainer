@@ -1,0 +1,11 @@
+[Desktop Entry]
+Terminal=false
+Name=ChotrainerCreator
+GenericName=ChotrainerCreator
+Comment=Creates files for Chotrainer
+Comment[de]=Erstellt Dateien für Chotrainer
+Exec=chotrainerCreator %f
+Icon=chotrainer
+Type=Application
+Categories=Education;Music;
+MimeType=application/x-midi;

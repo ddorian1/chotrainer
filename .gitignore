@@ -5,12 +5,12 @@ chotrainer/chotrainer
 chotrainer/release/
 chotrainerCreator/chotrainerCreator
 chotrainerCreator/release/
-core/libcore.so*
-core/release/
+libchotrainer/libchotrainer.so*
+libchotrainer/release/
 intl/*.qm
 moc/
 obj/
-qrc_core.cpp
+qrc_chotrainer.cpp
 qrc_intl.cpp
 qrc_res.cpp
 qrc_test.cpp

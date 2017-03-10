@@ -1,10 +1,10 @@
 [Setup]
 AppName=Chotrainer
-AppVersion=0.1.0
+AppVersion=0.1.1
 DefaultDirName={pf}\Chotrainer
 DefaultGroupName=Chotrainer
 SetupIconFile=..\windowsicon\icon.ico
-OutputBaseFilename=ChotrainerSetup-0.1.0
+OutputBaseFilename=ChotrainerSetup-0.1.1
 ChangesAssociations=yes
 
 [Languages]
@@ -25,8 +25,8 @@ Source: "files\Qt5Gui.dll"; DestDir: "{app}"
 Source: "files\Qt5Svg.dll"; DestDir: "{app}"
 Source: "files\Qt5Widgets.dll"; DestDir: "{app}"
 Source: "files\chotrainer.exe"; DestDir: "{app}"
+Source: "files\chotrainer0.dll"; DestDir: "{app}"
 Source: "files\chotrainerCreator.exe"; DestDir: "{app}"; Components: Creator
-Source: "files\core0.dll"; DestDir: "{app}"
 Source: "files\libbz2.dll"; DestDir: "{app}"
 Source: "files\libfluidsynth.dll"; DestDir: "{app}"
 Source: "files\libfreetype-6.dll"; DestDir: "{app}"

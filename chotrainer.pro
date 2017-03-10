@@ -1,13 +1,13 @@
 TEMPLATE = subdirs
-CONFIG += c++11 ordered
+CONFIG += ordered
 
-SUBDIRS =	core \
+SUBDIRS =	libchotrainer \
 			chotrainer \
 			chotrainerCreator \
 			test
 
 TRANSLATIONS += intl/chotrainer_de.ts
 
-chotrainer.depends = core
-chotrainerCreator.depends = core
-test.depends = core
+chotrainer.depends = libchotrainer
+chotrainerCreator.depends = libchotrainer
+test.depends = libchotrainer
