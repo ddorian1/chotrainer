@@ -1,5 +1,5 @@
 TEMPLATE = lib
-TARGET = core
+TARGET = chotrainer
 CONFIG += lib
 
 include(../common.pri)
@@ -14,7 +14,7 @@ SOURCES +=	ChotrainerParser.cpp \
 			Fluidsynth.cpp \
 			MidiParser.cpp
 
-RESOURCES += res/core.qrc \
+RESOURCES += res/chotrainer.qrc \
              ../intl/intl.qrc
 
 target.path = /usr/lib
